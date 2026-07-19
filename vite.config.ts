@@ -7,12 +7,12 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      '/profs': 'http://localhost:8081',
-      '/seances': 'http://localhost:8081',
-      '/classes': 'http://localhost:8081',
-      '/eleves': 'http://localhost:8081',
-      '/matieres': 'http://localhost:8081',
-      '/salles': 'http://localhost:8081',
+      '/profs': 'http://localhost:8081/planning-data',
+      '/seances': 'http://localhost:8081/planning-data',
+      '/classes': 'http://localhost:8081/planning-data',
+      '/eleves': 'http://localhost:8081/planning-data',
+      '/matieres': 'http://localhost:8081/planning-data',
+      '/salles': 'http://localhost:8081/planning-data'
     }
   }
 })
