@@ -5,13 +5,24 @@ export interface PlageHoraire {
   libelle: string;
 }
 
+export interface ProfesseurDayOff {
+  id?: number;
+  jourSemaine: number; // 1 = Lundi, 2 = Mardi, 3 = Mercredi, 4 = Jeudi, 5 = Vendredi
+}
+
 export interface Professeur {
   id?: number;
   nom: string;
   prenom: string;
   email: string;
   nb_heures: number;
+  maxHeuresParJour?: number;
+  maxHeuresParSemaine?: number;
+  maxHeuresParSeance?: number;
   plageHorairePreferee?: PlageHoraire | null;
+  seances?: Seance[];
+  daysOff?: ProfesseurDayOff[];
+  matieres?: Matiere[];
 }
 
 export interface Eleve {
@@ -37,6 +48,12 @@ export interface Salle {
   code: string;
   capacite: number;
   type: string;
+}
+
+export interface Creneau {
+  id?: number;
+  debut: string; // 'HH:mm:ss' or 'HH:mm'
+  fin: string;   // 'HH:mm:ss' or 'HH:mm'
 }
 
 export interface Seance {
@@ -217,5 +234,25 @@ export const api = {
     },
     delete: (id: number): Promise<void> => 
       fetch(`/seances/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
+  },
+
+  // CRENEAUX
+  creneaux: {
+    list: (): Promise<Creneau[]> => 
+      fetch('/creneaux/list').then(handleResponse),
+    create: (data: Creneau): Promise<Creneau> => 
+      fetch('/creneaux/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }).then(handleResponse),
+    update: (data: Creneau): Promise<Creneau> => 
+      fetch('/creneaux/update', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }).then(handleResponse),
+    delete: (id: number): Promise<void> => 
+      fetch(`/creneaux/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
   }
 };

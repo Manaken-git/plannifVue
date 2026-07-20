@@ -12,7 +12,8 @@ import type {
   Classe, 
   Matiere, 
   Salle, 
-  Seance 
+  Seance,
+  Creneau
 } from './services/api';
 
 // Components
@@ -27,7 +28,8 @@ import {
   ClassesTable, 
   ElevesTable, 
   MatieresTable, 
-  SallesTable 
+  SallesTable,
+  CreneauxTable
 } from './components/organisms/EntityTables';
 
 import './App.css';
@@ -43,6 +45,7 @@ export default function App() {
   const [matieres, setMatieres] = useState<Matiere[]>([]);
   const [salles, setSalles] = useState<Salle[]>([]);
   const [seances, setSeances] = useState<Seance[]>([]);
+  const [creneaux, setCreneaux] = useState<Creneau[]>([]);
   
   // Loading & Error States
   const [loading, setLoading] = useState(false);
@@ -69,13 +72,14 @@ export default function App() {
   const loadAllData = async () => {
     setLoading(true);
     try {
-      const [profsData, elevesData, classesData, matieresData, sallesData, seancesData] = await Promise.all([
+      const [profsData, elevesData, classesData, matieresData, sallesData, seancesData, creneauxData] = await Promise.all([
         api.professeurs.list().catch(() => []),
         api.eleves.listAll().catch(() => []),
         api.classes.list().catch(() => []),
         api.matieres.list().catch(() => []),
         api.salles.list().catch(() => []),
-        api.seances.list().catch(() => [])
+        api.seances.list().catch(() => []),
+        api.creneaux.list().catch(() => [])
       ]);
 
       setProfesseurs(profsData);
@@ -84,6 +88,7 @@ export default function App() {
       setMatieres(matieresData);
       setSalles(sallesData);
       setSeances(seancesData);
+      setCreneaux(creneauxData);
     } catch (err: any) {
       showToast("Erreur lors de la récupération des données", 'error');
     } finally {
@@ -166,6 +171,14 @@ export default function App() {
           await api.salles.update(payload);
           showToast("Salle mise à jour !");
         }
+      } else if (modalEntity === 'creneaux') {
+        if (modalType === 'create') {
+          await api.creneaux.create(payload);
+          showToast("Créneau horaire créé !");
+        } else {
+          await api.creneaux.update(payload);
+          showToast("Créneau horaire mis à jour !");
+        }
       } else if (modalEntity === 'dashboard') {
         const pId = associationIds?.professeurId;
         const cId = associationIds?.classeId;
@@ -200,6 +213,7 @@ export default function App() {
       else if (entity === 'classes') await api.classes.delete(id);
       else if (entity === 'matieres') await api.matieres.delete(id);
       else if (entity === 'salles') await api.salles.delete(id);
+      else if (entity === 'creneaux') await api.creneaux.delete(id);
       else if (entity === 'dashboard') await api.seances.delete(id);
 
       showToast("Élément supprimé avec succès !");
@@ -313,6 +327,16 @@ export default function App() {
             onDelete={(id) => handleDelete('salles', id)} 
           />
         )}
+
+        {activeTab === 'creneaux' && (
+          <CreneauxTable 
+            creneaux={creneaux} 
+            searchTerm={searchTerm} 
+            onSearchChange={setSearchTerm} 
+            onEdit={(c) => openEditModal('creneaux', c)} 
+            onDelete={(id) => handleDelete('creneaux', id)} 
+          />
+        )}
       </main>
 
       {/* Global Form Modal */}
@@ -326,6 +350,7 @@ export default function App() {
           professeurs={professeurs}
           matieres={matieres}
           salles={salles}
+          creneaux={creneaux}
           onClose={() => { setModalType(null); setModalEntity(null); }}
           onDelete={handleDelete}
           onSave={handleSave}

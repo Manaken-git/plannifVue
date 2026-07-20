@@ -12,7 +12,8 @@ export default defineConfig({
       '/classes': 'http://localhost:8081/planning-data',
       '/eleves': 'http://localhost:8081/planning-data',
       '/matieres': 'http://localhost:8081/planning-data',
-      '/salles': 'http://localhost:8081/planning-data'
+      '/salles': 'http://localhost:8081/planning-data',
+      '/creneaux': 'http://localhost:8081/planning-data',
     }
   }
 })

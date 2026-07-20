@@ -24,6 +24,7 @@ export const Header: React.FC<HeaderProps> = ({
       case 'eleves': return 'Gestion des Élèves';
       case 'matieres': return 'Gestion des Matières';
       case 'salles': return 'Gestion des Salles';
+      case 'creneaux': return 'Gestion des Créneaux Horaires';
       default: return '';
     }
   };
@@ -36,6 +37,7 @@ export const Header: React.FC<HeaderProps> = ({
       case 'eleves': return 'Gestion individuelle des élèves';
       case 'matieres': return 'Catalogue des cours enseignés';
       case 'salles': return 'Locaux et capacités d\'accueil';
+      case 'creneaux': return 'Plages et créneaux horaires de cours';
       default: return '';
     }
   };
@@ -48,6 +50,7 @@ export const Header: React.FC<HeaderProps> = ({
       case 'eleves': return 'Élève';
       case 'matieres': return 'Matière';
       case 'salles': return 'Salle';
+      case 'creneaux': return 'Créneau';
       default: return '';
     }
   };

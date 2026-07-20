@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Trash2 } from 'lucide-react';
+import { X, Trash2, Plus } from 'lucide-react';
 import { Button } from '../atoms/Button';
 import type { Tab } from './Sidebar';
-import type { Professeur, Eleve, Classe, Matiere, Salle, Seance } from '../../services/api';
+import type { Professeur, Eleve, Classe, Matiere, Salle, Seance, ProfesseurDayOff, Creneau } from '../../services/api';
 
 interface FormModalProps {
   modalType: 'create' | 'edit';
@@ -13,6 +13,7 @@ interface FormModalProps {
   professeurs: Professeur[];
   matieres: Matiere[];
   salles: Salle[];
+  creneaux: Creneau[];
   onClose: () => void;
   onDelete: (entity: Tab, id: number) => void;
   onSave: (
@@ -35,6 +36,7 @@ export const FormModal: React.FC<FormModalProps> = ({
   professeurs,
   matieres,
   salles,
+  creneaux,
   onClose,
   onDelete,
   onSave
@@ -44,7 +46,12 @@ export const FormModal: React.FC<FormModalProps> = ({
   const [profPrenom, setProfPrenom] = useState('');
   const [profEmail, setProfEmail] = useState('');
   const [profHeures, setProfHeures] = useState(0);
+  const [profMaxJour, setProfMaxJour] = useState<number | ''>('');
+  const [profMaxSemaine, setProfMaxSemaine] = useState<number | ''>('');
+  const [profMaxSeance, setProfMaxSeance] = useState<number | ''>('');
   const [profPlage, setProfPlage] = useState('');
+  const [profMatiereIds, setProfMatiereIds] = useState<number[]>([]);
+  const [profDaysOff, setProfDaysOff] = useState<ProfesseurDayOff[]>([]);
 
   // Eleve Form States
   const [eleveNom, setEleveNom] = useState('');
@@ -71,6 +78,10 @@ export const FormModal: React.FC<FormModalProps> = ({
   const [seanceMatiereId, setSeanceMatiereId] = useState<number | ''>('');
   const [seanceSalleId, setSeanceSalleId] = useState<number | ''>('');
 
+  // Creneau Form States
+  const [creneauDebut, setCreneauDebut] = useState('08:00');
+  const [creneauFin, setCreneauFin] = useState('10:00');
+
   // Initialize or Reset Fields
   useEffect(() => {
     if (modalType === 'edit' && selectedItem) {
@@ -79,7 +90,12 @@ export const FormModal: React.FC<FormModalProps> = ({
         setProfPrenom(selectedItem.prenom || '');
         setProfEmail(selectedItem.email || '');
         setProfHeures(selectedItem.nb_heures || 0);
+        setProfMaxJour(selectedItem.maxHeuresParJour ?? '');
+        setProfMaxSemaine(selectedItem.maxHeuresParSemaine ?? '');
+        setProfMaxSeance(selectedItem.maxHeuresParSeance ?? '');
         setProfPlage(selectedItem.plageHorairePreferee?.libelle || '');
+        setProfMatiereIds(selectedItem.matieres ? selectedItem.matieres.map((m: Matiere) => m.id!).filter(Boolean) : []);
+        setProfDaysOff(selectedItem.daysOff || []);
       } else if (modalEntity === 'eleves') {
         setEleveNom(selectedItem.nom || '');
         setElevePrenom(selectedItem.prenom || '');
@@ -108,6 +124,9 @@ export const FormModal: React.FC<FormModalProps> = ({
 
         const matchedSalle = salles.find(s => s.code === selectedItem.salleCode);
         setSeanceSalleId(matchedSalle?.id || '');
+      } else if (modalEntity === 'creneaux') {
+        setCreneauDebut(selectedItem.debut || '08:00');
+        setCreneauFin(selectedItem.fin || '10:00');
       }
     } else {
       // Create / reset
@@ -115,7 +134,12 @@ export const FormModal: React.FC<FormModalProps> = ({
       setProfPrenom('');
       setProfEmail('');
       setProfHeures(0);
+      setProfMaxJour('');
+      setProfMaxSemaine('');
+      setProfMaxSeance('');
       setProfPlage('');
+      setProfMatiereIds([]);
+      setProfDaysOff([]);
 
       setEleveNom('');
       setElevePrenom('');
@@ -129,6 +153,9 @@ export const FormModal: React.FC<FormModalProps> = ({
       setSalleCode('');
       setSalleCapacite(0);
       setSalleType('Cours');
+
+      setCreneauDebut('08:00');
+      setCreneauFin('10:00');
 
       // Default current time formatted to ISO minus seconds/ms
       const now = new Date();
@@ -148,16 +175,50 @@ export const FormModal: React.FC<FormModalProps> = ({
     }
   }, [modalType, modalEntity, selectedItem, professeurs, classes, matieres, salles]);
 
+  const DAYS_OF_WEEK = [
+    { num: 1, label: 'Lundi' },
+    { num: 2, label: 'Mardi' },
+    { num: 3, label: 'Mercredi' },
+    { num: 4, label: 'Jeudi' },
+    { num: 5, label: 'Vendredi' }
+  ];
+
+  const handleToggleDayOff = (jourSemaine: number) => {
+    setProfDaysOff(prev => {
+      const exists = prev.some(d => d.jourSemaine === jourSemaine);
+      if (exists) {
+        return prev.filter(d => d.jourSemaine !== jourSemaine);
+      } else {
+        return [...prev, { jourSemaine }];
+      }
+    });
+  };
+
+  const handleToggleMatiere = (matiereId: number) => {
+    setProfMatiereIds(prev => 
+      prev.includes(matiereId) 
+        ? prev.filter(id => id !== matiereId)
+        : [...prev, matiereId]
+    );
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (modalEntity === 'professeurs') {
+      const selectedMatieresObjects = matieres.filter(m => m.id && profMatiereIds.includes(m.id));
       const payload: Professeur = {
         id: selectedItem?.id,
         nom: profNom,
         prenom: profPrenom,
         email: profEmail,
-        nb_heures: profHeures,
-        plageHorairePreferee: profPlage ? { libelle: profPlage } : null
+        nb_heures: Number(profHeures),
+        maxHeuresParJour: profMaxJour !== '' ? Number(profMaxJour) : undefined,
+        maxHeuresParSemaine: profMaxSemaine !== '' ? Number(profMaxSemaine) : undefined,
+        maxHeuresParSeance: profMaxSeance !== '' ? Number(profMaxSeance) : undefined,
+        plageHorairePreferee: profPlage ? { libelle: profPlage } : null,
+        matieres: selectedMatieresObjects,
+        daysOff: profDaysOff,
+        seances: selectedItem?.seances || []
       };
       onSave(payload);
     } else if (modalEntity === 'eleves') {
@@ -200,6 +261,13 @@ export const FormModal: React.FC<FormModalProps> = ({
         matiereId: seanceMatiereId ? Number(seanceMatiereId) : undefined,
         salleId: seanceSalleId ? Number(seanceSalleId) : undefined
       });
+    } else if (modalEntity === 'creneaux') {
+      const payload: Creneau = {
+        id: selectedItem?.id,
+        debut: creneauDebut.length === 5 ? `${creneauDebut}:00` : creneauDebut,
+        fin: creneauFin.length === 5 ? `${creneauFin}:00` : creneauFin,
+      };
+      onSave(payload);
     }
   };
 
@@ -212,13 +280,14 @@ export const FormModal: React.FC<FormModalProps> = ({
       case 'eleves': return `${action} : Élève`;
       case 'matieres': return `${action} : Matière`;
       case 'salles': return `${action} : Salle`;
+      case 'creneaux': return `${action} : Créneau Horaire`;
       default: return '';
     }
   };
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
+      <div className="modal-content" style={{ maxWidth: modalEntity === 'professeurs' ? '650px' : '500px' }}>
         <div className="modal-header">
           <h2>{getModalTitle()}</h2>
           <button className="modal-close" onClick={onClose}>
@@ -230,25 +299,110 @@ export const FormModal: React.FC<FormModalProps> = ({
           {/* PROFESSEUR FORM FIELDS */}
           {modalEntity === 'professeurs' && (
             <>
-              <div className="form-group">
-                <label>Nom</label>
-                <input type="text" className="form-control" value={profNom} onChange={e => setProfNom(e.target.value)} required />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div className="form-group">
+                  <label>Nom</label>
+                  <input type="text" className="form-control" value={profNom} onChange={e => setProfNom(e.target.value)} required />
+                </div>
+                <div className="form-group">
+                  <label>Prénom</label>
+                  <input type="text" className="form-control" value={profPrenom} onChange={e => setProfPrenom(e.target.value)} required />
+                </div>
               </div>
-              <div className="form-group">
-                <label>Prénom</label>
-                <input type="text" className="form-control" value={profPrenom} onChange={e => setProfPrenom(e.target.value)} required />
-              </div>
+
               <div className="form-group">
                 <label>Email</label>
                 <input type="email" className="form-control" value={profEmail} onChange={e => setProfEmail(e.target.value)} required />
               </div>
-              <div className="form-group">
-                <label>Volume d'heures</label>
-                <input type="number" className="form-control" value={profHeures} onChange={e => setProfHeures(Number(e.target.value))} required />
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div className="form-group">
+                  <label>Volume d'heures (Total)</label>
+                  <input type="number" step="0.5" className="form-control" value={profHeures} onChange={e => setProfHeures(Number(e.target.value))} required />
+                </div>
+                <div className="form-group">
+                  <label>Max heures / jour</label>
+                  <input type="number" step="0.5" className="form-control" placeholder="ex: 6" value={profMaxJour} onChange={e => setProfMaxJour(e.target.value ? Number(e.target.value) : '')} />
+                </div>
               </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div className="form-group">
+                  <label>Max heures / semaine</label>
+                  <input type="number" step="0.5" className="form-control" placeholder="ex: 35" value={profMaxSemaine} onChange={e => setProfMaxSemaine(e.target.value ? Number(e.target.value) : '')} />
+                </div>
+                <div className="form-group">
+                  <label>Max heures / séance</label>
+                  <input type="number" step="0.5" className="form-control" placeholder="ex: 2" value={profMaxSeance} onChange={e => setProfMaxSeance(e.target.value ? Number(e.target.value) : '')} />
+                </div>
+              </div>
+
               <div className="form-group">
                 <label>Plage Horaire Préférée (libellé)</label>
                 <input type="text" className="form-control" placeholder="ex: Lundi Matin, Mardi 8h-10h" value={profPlage} onChange={e => setProfPlage(e.target.value)} />
+              </div>
+
+              {/* MATIERES ENSEIGNEES */}
+              <div className="form-group">
+                <label>Matières Enseignées</label>
+                {matieres.length === 0 ? (
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Aucune matière créée pour le moment.</p>
+                ) : (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.25rem' }}>
+                    {matieres.map(m => {
+                      const isSelected = m.id ? profMatiereIds.includes(m.id) : false;
+                      return (
+                        <button
+                          type="button"
+                          key={m.id}
+                          onClick={() => m.id && handleToggleMatiere(m.id)}
+                          style={{
+                            padding: '0.4rem 0.8rem',
+                            borderRadius: '20px',
+                            border: `1px solid ${isSelected ? 'var(--primary)' : 'var(--border-color)'}`,
+                            backgroundColor: isSelected ? 'var(--primary-light)' : 'var(--bg-main)',
+                            color: isSelected ? 'white' : 'var(--text-secondary)',
+                            cursor: 'pointer',
+                            fontSize: '0.85rem',
+                            transition: 'all 0.2s'
+                          }}
+                        >
+                          {isSelected ? '✓ ' : '+ '}{m.nom}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* DAYS OFF / CONGES (1-5) */}
+              <div className="form-group">
+                <label>Jours de non-travail (Days Off)</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.25rem' }}>
+                  {DAYS_OF_WEEK.map(day => {
+                    const isOff = profDaysOff.some(d => d.jourSemaine === day.num);
+                    return (
+                      <button
+                        type="button"
+                        key={day.num}
+                        onClick={() => handleToggleDayOff(day.num)}
+                        style={{
+                          padding: '0.4rem 0.8rem',
+                          borderRadius: '20px',
+                          border: `1px solid ${isOff ? 'var(--danger)' : 'var(--border-color)'}`,
+                          backgroundColor: isOff ? 'var(--danger-light)' : 'var(--bg-main)',
+                          color: isOff ? '#f87171' : 'var(--text-secondary)',
+                          cursor: 'pointer',
+                          fontSize: '0.85rem',
+                          fontWeight: isOff ? 600 : 400,
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        {isOff ? '🚫 ' : '🗓️ '}{day.label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </>
           )}
@@ -371,6 +525,34 @@ export const FormModal: React.FC<FormModalProps> = ({
                     <option key={s.id} value={s.id}>{s.code} ({s.type})</option>
                   ))}
                 </select>
+              </div>
+            </>
+          )}
+
+          {/* CRENEAU FORM FIELDS */}
+          {modalEntity === 'creneaux' && (
+            <>
+              <div className="form-group">
+                <label>Heure de début (LocalTime)</label>
+                <input 
+                  type="time" 
+                  step="1" 
+                  className="form-control" 
+                  value={creneauDebut} 
+                  onChange={e => setCreneauDebut(e.target.value)} 
+                  required 
+                />
+              </div>
+              <div className="form-group">
+                <label>Heure de fin (LocalTime)</label>
+                <input 
+                  type="time" 
+                  step="1" 
+                  className="form-control" 
+                  value={creneauFin} 
+                  onChange={e => setCreneauFin(e.target.value)} 
+                  required 
+                />
               </div>
             </>
           )}

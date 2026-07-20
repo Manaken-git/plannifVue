@@ -1,8 +1,8 @@
 import React from 'react';
-import { Search, Edit2, Trash2, GraduationCap, Users, UserCheck, BookOpen, Home } from 'lucide-react';
+import { Search, Edit2, Trash2, GraduationCap, Users, UserCheck, BookOpen, Home, Clock } from 'lucide-react';
 import { Badge } from '../atoms/Badge';
 import { Button } from '../atoms/Button';
-import type { Professeur, Eleve, Classe, Matiere, Salle } from '../../services/api';
+import type { Professeur, Eleve, Classe, Matiere, Salle, Creneau } from '../../services/api';
 
 interface TableHeaderProps {
   title: string;
@@ -73,8 +73,10 @@ export const ProfesseursTable: React.FC<ProfesseursTableProps> = ({
             <tr>
               <th>Nom & Prénom</th>
               <th>Email</th>
-              <th>Volume d'heures</th>
+              <th>Volume & Contraintes</th>
+              <th>Matières Enseignées</th>
               <th>Plage Horaire Préférée</th>
+              <th>Jours Off</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -84,13 +86,47 @@ export const ProfesseursTable: React.FC<ProfesseursTableProps> = ({
                 <td style={{ fontWeight: 600 }}>{p.nom} {p.prenom}</td>
                 <td>{p.email}</td>
                 <td>
-                  <Badge variant="primary">{p.nb_heures} h</Badge>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                    <div><Badge variant="primary">{p.nb_heures} h total</Badge></div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                      {p.maxHeuresParJour !== undefined && <span>Jour: <strong>{p.maxHeuresParJour}h</strong> </span>}
+                      {p.maxHeuresParSemaine !== undefined && <span>| Sem: <strong>{p.maxHeuresParSemaine}h</strong> </span>}
+                      {p.maxHeuresParSeance !== undefined && <span>| Séance: <strong>{p.maxHeuresParSeance}h</strong></span>}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  {p.matieres && p.matieres.length > 0 ? (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
+                      {p.matieres.map(m => (
+                        <Badge key={m.id || m.nom} variant="warning">{m.nom}</Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Aucune</span>
+                  )}
                 </td>
                 <td>
                   {p.plageHorairePreferee ? (
                     <Badge variant="success">{p.plageHorairePreferee.libelle}</Badge>
                   ) : (
                     <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Non spécifié</span>
+                  )}
+                </td>
+                <td>
+                  {p.daysOff && p.daysOff.length > 0 ? (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
+                      {p.daysOff.map(d => {
+                        const dayNames: Record<number, string> = { 1: 'Lun', 2: 'Mar', 3: 'Mer', 4: 'Jeu', 5: 'Ven' };
+                        return (
+                          <Badge key={d.id || d.jourSemaine} variant="warning">
+                            🚫 {dayNames[d.jourSemaine] || `Jour ${d.jourSemaine}`}
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Aucun</span>
                   )}
                 </td>
                 <td className="actions-cell">
@@ -347,6 +383,74 @@ export const SallesTable: React.FC<SallesTableProps> = ({
                 <td className="actions-cell">
                   <Button variant="icon-edit" onClick={() => onEdit(s)} icon={<Edit2 size={16} />} />
                   <Button variant="icon-delete" onClick={() => s.id && onDelete(s.id)} icon={<Trash2 size={16} />} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+};
+
+// 6. CRENEAUX TABLE
+interface CreneauxTableProps {
+  creneaux: Creneau[];
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+  onEdit: (creneau: Creneau) => void;
+  onDelete: (id: number) => void;
+}
+
+export const CreneauxTable: React.FC<CreneauxTableProps> = ({
+  creneaux,
+  searchTerm,
+  onSearchChange,
+  onEdit,
+  onDelete,
+}) => {
+  const filtered = creneaux.filter(c => 
+    `${c.debut} - ${c.fin}`.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div className="table-card">
+      <TableHeader 
+        title={`Créneaux horaires (${creneaux.length})`}
+        searchTerm={searchTerm}
+        onSearchChange={onSearchChange}
+        placeholder="Rechercher une heure..."
+      />
+
+      {filtered.length === 0 ? (
+        <div className="empty-state">
+          <Clock className="empty-state-icon" />
+          <h3>Aucun créneau trouvé</h3>
+          <p>Ajoutez des créneaux horaires à l'aide du bouton "+".</p>
+        </div>
+      ) : (
+        <table className="custom-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Heure de Début</th>
+              <th>Heure de Fin</th>
+              <th>Plage Horaire</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map(c => (
+              <tr key={c.id}>
+                <td>#{c.id}</td>
+                <td style={{ fontWeight: 600 }}>{c.debut}</td>
+                <td style={{ fontWeight: 600 }}>{c.fin}</td>
+                <td>
+                  <Badge variant="primary">{c.debut} ➔ {c.fin}</Badge>
+                </td>
+                <td className="actions-cell">
+                  <Button variant="icon-edit" onClick={() => onEdit(c)} icon={<Edit2 size={16} />} />
+                  <Button variant="icon-delete" onClick={() => c.id && onDelete(c.id)} icon={<Trash2 size={16} />} />
                 </td>
               </tr>
             ))}
