@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { 
   Calendar as CalendarIcon, 
   Users, 
@@ -13,7 +13,8 @@ import type {
   Matiere, 
   Salle, 
   Seance,
-  Creneau
+  Creneau,
+  MatiereClasseConfig
 } from './services/api';
 
 // Components
@@ -29,7 +30,8 @@ import {
   ElevesTable, 
   MatieresTable, 
   SallesTable,
-  CreneauxTable
+  CreneauxTable,
+  MatiereClasseConfigsTable
 } from './components/organisms/EntityTables';
 
 import './App.css';
@@ -46,6 +48,7 @@ export default function App() {
   const [salles, setSalles] = useState<Salle[]>([]);
   const [seances, setSeances] = useState<Seance[]>([]);
   const [creneaux, setCreneaux] = useState<Creneau[]>([]);
+  const [matiereClasseConfigs, setMatiereClasseConfigs] = useState<MatiereClasseConfig[]>([]);
   
   // Loading & Error States
   const [loading, setLoading] = useState(false);
@@ -72,14 +75,15 @@ export default function App() {
   const loadAllData = async () => {
     setLoading(true);
     try {
-      const [profsData, elevesData, classesData, matieresData, sallesData, seancesData, creneauxData] = await Promise.all([
+      const [profsData, elevesData, classesData, matieresData, sallesData, seancesData, creneauxData, configsData] = await Promise.all([
         api.professeurs.list().catch(() => []),
         api.eleves.listAll().catch(() => []),
         api.classes.list().catch(() => []),
         api.matieres.list().catch(() => []),
         api.salles.list().catch(() => []),
         api.seances.list().catch(() => []),
-        api.creneaux.list().catch(() => [])
+        api.creneaux.list().catch(() => []),
+        api.configs.list().catch(() => [])
       ]);
 
       setProfesseurs(profsData);
@@ -89,6 +93,7 @@ export default function App() {
       setSalles(sallesData);
       setSeances(seancesData);
       setCreneaux(creneauxData);
+      setMatiereClasseConfigs(configsData);
     } catch (err: any) {
       showToast("Erreur lors de la récupération des données", 'error');
     } finally {
@@ -179,6 +184,14 @@ export default function App() {
           await api.creneaux.update(payload);
           showToast("Créneau horaire mis à jour !");
         }
+      } else if (modalEntity === 'configs') {
+        if (modalType === 'create') {
+          await api.configs.create(payload);
+          showToast("Configuration créée !");
+        } else {
+          await api.configs.update(payload);
+          showToast("Configuration mise à jour !");
+        }
       } else if (modalEntity === 'dashboard') {
         const pId = associationIds?.professeurId;
         const cId = associationIds?.classeId;
@@ -214,6 +227,7 @@ export default function App() {
       else if (entity === 'matieres') await api.matieres.delete(id);
       else if (entity === 'salles') await api.salles.delete(id);
       else if (entity === 'creneaux') await api.creneaux.delete(id);
+      else if (entity === 'configs') await api.configs.delete(id);
       else if (entity === 'dashboard') await api.seances.delete(id);
 
       showToast("Élément supprimé avec succès !");
@@ -337,6 +351,16 @@ export default function App() {
             onDelete={(id) => handleDelete('creneaux', id)} 
           />
         )}
+
+        {activeTab === 'configs' && (
+          <MatiereClasseConfigsTable 
+            configs={matiereClasseConfigs} 
+            searchTerm={searchTerm} 
+            onSearchChange={setSearchTerm} 
+            onEdit={(c) => openEditModal('configs', c)} 
+            onDelete={(id) => handleDelete('configs', id)} 
+          />
+        )}
       </main>
 
       {/* Global Form Modal */}
@@ -350,7 +374,6 @@ export default function App() {
           professeurs={professeurs}
           matieres={matieres}
           salles={salles}
-          creneaux={creneaux}
           onClose={() => { setModalType(null); setModalEntity(null); }}
           onDelete={handleDelete}
           onSave={handleSave}

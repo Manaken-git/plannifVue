@@ -14,6 +14,7 @@ export default defineConfig({
       '/matieres': 'http://localhost:8081/planning-data',
       '/salles': 'http://localhost:8081/planning-data',
       '/creneaux': 'http://localhost:8081/planning-data',
+      '/config': 'http://localhost:8081/planning-data',
     }
   }
 })

@@ -6,10 +6,11 @@ import {
   BookOpen, 
   Home, 
   GraduationCap,
-  Clock
+  Clock,
+  Sliders
 } from 'lucide-react';
 
-export type Tab = 'dashboard' | 'professeurs' | 'classes' | 'eleves' | 'matieres' | 'salles' | 'creneaux';
+export type Tab = 'dashboard' | 'professeurs' | 'classes' | 'eleves' | 'matieres' | 'salles' | 'creneaux' | 'configs';
 
 interface SidebarProps {
   activeTab: Tab;
@@ -25,6 +26,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
     { id: 'matieres' as Tab, label: 'Matières', icon: <BookOpen size={18} /> },
     { id: 'salles' as Tab, label: 'Salles', icon: <Home size={18} /> },
     { id: 'creneaux' as Tab, label: 'Créneaux', icon: <Clock size={18} /> },
+    { id: 'configs' as Tab, label: 'Config. Matières', icon: <Sliders size={18} /> },
   ];
 
   return (

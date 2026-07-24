@@ -1,8 +1,8 @@
 import React from 'react';
-import { Search, Edit2, Trash2, GraduationCap, Users, UserCheck, BookOpen, Home, Clock } from 'lucide-react';
+import { Search, Edit2, Trash2, GraduationCap, Users, UserCheck, BookOpen, Home, Clock, Sliders } from 'lucide-react';
 import { Badge } from '../atoms/Badge';
 import { Button } from '../atoms/Button';
-import type { Professeur, Eleve, Classe, Matiere, Salle, Creneau } from '../../services/api';
+import type { Professeur, Eleve, Classe, Matiere, Salle, Creneau, MatiereClasseConfig } from '../../services/api';
 
 interface TableHeaderProps {
   title: string;
@@ -460,3 +460,91 @@ export const CreneauxTable: React.FC<CreneauxTableProps> = ({
     </div>
   );
 };
+
+// 7. MATIERE CLASSE CONFIGS TABLE
+interface MatiereClasseConfigsTableProps {
+  configs: MatiereClasseConfig[];
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+  onEdit: (config: MatiereClasseConfig) => void;
+  onDelete: (id: number) => void;
+}
+
+export const MatiereClasseConfigsTable: React.FC<MatiereClasseConfigsTableProps> = ({
+  configs,
+  searchTerm,
+  onSearchChange,
+  onEdit,
+  onDelete,
+}) => {
+  const filtered = configs.filter(c => 
+    (c.classeNom || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (c.matiereNom || '').toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const formatDate = (dateStr: string | null | undefined) => {
+    if (!dateStr) return 'Non définie';
+    try {
+      const [year, month, day] = dateStr.split('-');
+      return `${day}/${month}/${year}`;
+    } catch {
+      return dateStr;
+    }
+  };
+
+  return (
+    <div className="table-card">
+      <TableHeader 
+        title={`Configurations Matières/Classes (${configs.length})`}
+        searchTerm={searchTerm}
+        onSearchChange={onSearchChange}
+        placeholder="Rechercher par classe ou matière..."
+      />
+
+      {filtered.length === 0 ? (
+        <div className="empty-state">
+          <Sliders className="empty-state-icon" />
+          <h3>Aucune configuration trouvée</h3>
+          <p>Associez des matières à vos classes avec des périodes de validité.</p>
+        </div>
+      ) : (
+        <table className="custom-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Classe</th>
+              <th>Matière</th>
+              <th>Date de Début</th>
+              <th>Date de Fin</th>
+              <th>Période</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map(c => (
+              <tr key={c.id}>
+                <td>#{c.id}</td>
+                <td style={{ fontWeight: 600 }}>{c.classeNom || `Classe ID: ${c.classeId}`}</td>
+                <td style={{ fontWeight: 600 }}>
+                  <Badge variant="warning">{c.matiereNom || `Matière ID: ${c.matiereId}`}</Badge>
+                </td>
+                <td>{formatDate(c.dateDebut)}</td>
+                <td>{formatDate(c.dateFin)}</td>
+                <td>
+                  <Badge variant="primary">
+                    {c.dateDebut ? formatDate(c.dateDebut) : '∞'} ➔ {c.dateFin ? formatDate(c.dateFin) : '∞'}
+                  </Badge>
+                </td>
+                <td className="actions-cell">
+                  <Button variant="icon-edit" onClick={() => onEdit(c)} icon={<Edit2 size={16} />} />
+                  <Button variant="icon-delete" onClick={() => c.id && onDelete(c.id)} icon={<Trash2 size={16} />} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+};
+

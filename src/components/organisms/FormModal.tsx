@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Trash2, Plus } from 'lucide-react';
+import { X, Trash2 } from 'lucide-react';
 import { Button } from '../atoms/Button';
 import type { Tab } from './Sidebar';
-import type { Professeur, Eleve, Classe, Matiere, Salle, Seance, ProfesseurDayOff, Creneau } from '../../services/api';
+import type { Professeur, Eleve, Classe, Matiere, Salle, Seance, ProfesseurDayOff, Creneau, MatiereClasseConfig } from '../../services/api';
 
 interface FormModalProps {
   modalType: 'create' | 'edit';
@@ -13,7 +13,6 @@ interface FormModalProps {
   professeurs: Professeur[];
   matieres: Matiere[];
   salles: Salle[];
-  creneaux: Creneau[];
   onClose: () => void;
   onDelete: (entity: Tab, id: number) => void;
   onSave: (
@@ -36,7 +35,6 @@ export const FormModal: React.FC<FormModalProps> = ({
   professeurs,
   matieres,
   salles,
-  creneaux,
   onClose,
   onDelete,
   onSave
@@ -81,6 +79,12 @@ export const FormModal: React.FC<FormModalProps> = ({
   // Creneau Form States
   const [creneauDebut, setCreneauDebut] = useState('08:00');
   const [creneauFin, setCreneauFin] = useState('10:00');
+
+  // MatiereClasseConfig Form States
+  const [configClasseId, setConfigClasseId] = useState<number | ''>('');
+  const [configMatiereId, setConfigMatiereId] = useState<number | ''>('');
+  const [configDateDebut, setConfigDateDebut] = useState('');
+  const [configDateFin, setConfigDateFin] = useState('');
 
   // Initialize or Reset Fields
   useEffect(() => {
@@ -127,6 +131,11 @@ export const FormModal: React.FC<FormModalProps> = ({
       } else if (modalEntity === 'creneaux') {
         setCreneauDebut(selectedItem.debut || '08:00');
         setCreneauFin(selectedItem.fin || '10:00');
+      } else if (modalEntity === 'configs') {
+        setConfigClasseId(selectedItem.classeId || '');
+        setConfigMatiereId(selectedItem.matiereId || '');
+        setConfigDateDebut(selectedItem.dateDebut || '');
+        setConfigDateFin(selectedItem.dateFin || '');
       }
     } else {
       // Create / reset
@@ -172,6 +181,11 @@ export const FormModal: React.FC<FormModalProps> = ({
       setSeanceClasseId('');
       setSeanceMatiereId('');
       setSeanceSalleId('');
+
+      setConfigClasseId('');
+      setConfigMatiereId('');
+      setConfigDateDebut('');
+      setConfigDateFin('');
     }
   }, [modalType, modalEntity, selectedItem, professeurs, classes, matieres, salles]);
 
@@ -268,6 +282,15 @@ export const FormModal: React.FC<FormModalProps> = ({
         fin: creneauFin.length === 5 ? `${creneauFin}:00` : creneauFin,
       };
       onSave(payload);
+    } else if (modalEntity === 'configs') {
+      const payload: MatiereClasseConfig = {
+        id: selectedItem?.id,
+        classeId: configClasseId ? Number(configClasseId) : undefined,
+        matiereId: configMatiereId ? Number(configMatiereId) : undefined,
+        dateDebut: configDateDebut || null,
+        dateFin: configDateFin || null,
+      };
+      onSave(payload);
     }
   };
 
@@ -281,6 +304,7 @@ export const FormModal: React.FC<FormModalProps> = ({
       case 'matieres': return `${action} : Matière`;
       case 'salles': return `${action} : Salle`;
       case 'creneaux': return `${action} : Créneau Horaire`;
+      case 'configs': return `${action} : Config. Matière`;
       default: return '';
     }
   };
@@ -552,6 +576,58 @@ export const FormModal: React.FC<FormModalProps> = ({
                   value={creneauFin} 
                   onChange={e => setCreneauFin(e.target.value)} 
                   required 
+                />
+              </div>
+            </>
+          )}
+
+          {/* CONFIGS FORM FIELDS */}
+          {modalEntity === 'configs' && (
+            <>
+              <div className="form-group">
+                <label>Classe</label>
+                <select 
+                  className="form-control" 
+                  value={configClasseId} 
+                  onChange={e => setConfigClasseId(e.target.value ? Number(e.target.value) : '')} 
+                  required
+                >
+                  <option value="">-- Sélectionner une classe --</option>
+                  {classes.map(c => (
+                    <option key={c.id} value={c.id}>{c.nom}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Matière</label>
+                <select 
+                  className="form-control" 
+                  value={configMatiereId} 
+                  onChange={e => setConfigMatiereId(e.target.value ? Number(e.target.value) : '')} 
+                  required
+                >
+                  <option value="">-- Sélectionner la matière --</option>
+                  {matieres.map(m => (
+                    <option key={m.id} value={m.id}>{m.nom}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Date de Début (Optionnel)</label>
+                <input 
+                  type="date" 
+                  className="form-control" 
+                  value={configDateDebut} 
+                  onChange={e => setConfigDateDebut(e.target.value)} 
+                />
+              </div>
+              <div className="form-group">
+                <label>Date de Fin (Optionnel)</label>
+                <input 
+                  type="date" 
+                  className="form-control" 
+                  value={configDateFin} 
+                  onChange={e => setConfigDateFin(e.target.value)} 
                 />
               </div>
             </>

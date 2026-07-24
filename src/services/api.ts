@@ -66,6 +66,17 @@ export interface Seance {
   salleCode?: string;
 }
 
+export interface MatiereClasseConfig {
+  id?: number;
+  classeId?: number;
+  classeNom?: string;
+  matiereId?: number;
+  matiereNom?: string;
+  dateDebut?: string | null;
+  dateFin?: string | null;
+}
+
+
 const handleResponse = async (response: Response) => {
   if (!response.ok) {
     const errorText = await response.text().catch(() => 'Unknown error');
@@ -254,5 +265,25 @@ export const api = {
       }).then(handleResponse),
     delete: (id: number): Promise<void> => 
       fetch(`/creneaux/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
+  },
+
+  // MATIERE CLASSE CONFIGS
+  configs: {
+    list: (): Promise<MatiereClasseConfig[]> => 
+      fetch('/configs/list').then(handleResponse),
+    create: (data: MatiereClasseConfig): Promise<MatiereClasseConfig> => 
+      fetch('/configs/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }).then(handleResponse),
+    update: (data: MatiereClasseConfig): Promise<MatiereClasseConfig> => 
+      fetch('/configs/update', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }).then(handleResponse),
+    delete: (id: number): Promise<void> => 
+      fetch(`/configs/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
   }
 };
