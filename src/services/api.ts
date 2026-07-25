@@ -40,7 +40,6 @@ export interface Classe {
 export interface Matiere {
   id?: number;
   nom: string;
-  volumeHoraireAnnuel: number;
 }
 
 export interface Salle {
@@ -74,6 +73,7 @@ export interface MatiereClasseConfig {
   matiereNom?: string;
   dateDebut?: string | null;
   dateFin?: string | null;
+  volumeHorairePeriode?: number | null;
 }
 
 
@@ -90,6 +90,15 @@ const handleResponse = async (response: Response) => {
     return response.json();
   }
   return null;
+};
+
+const importFile = (url: string, file: File): Promise<any> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  return fetch(url, {
+    method: 'POST',
+    body: formData,
+  }).then(handleResponse);
 };
 
 export const api = {
@@ -111,6 +120,8 @@ export const api = {
       }).then(handleResponse),
     delete: (id: number): Promise<void> => 
       fetch(`/profs/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
+    import: (file: File): Promise<any> => 
+      importFile('/profs/import', file),
   },
 
   // ELEVES
@@ -137,6 +148,8 @@ export const api = {
     },
     delete: (id: number): Promise<void> => 
       fetch(`/eleves/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
+    import: (file: File): Promise<any> => 
+      importFile('/eleves/import', file),
   },
 
   // CLASSES
@@ -157,6 +170,8 @@ export const api = {
       }).then(handleResponse),
     delete: (id: number): Promise<void> => 
       fetch(`/classes/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
+    import: (file: File): Promise<any> => 
+      importFile('/classes/import', file),
   },
 
   // MATIERES
@@ -177,6 +192,8 @@ export const api = {
       }).then(handleResponse),
     delete: (id: number): Promise<void> => 
       fetch(`/matieres/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
+    import: (file: File): Promise<any> => 
+      importFile('/matieres/import', file),
   },
 
   // SALLES
@@ -197,6 +214,8 @@ export const api = {
       }).then(handleResponse),
     delete: (id: number): Promise<void> => 
       fetch(`/salles/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
+    import: (file: File): Promise<any> => 
+      importFile('/salles/import', file),
   },
 
   // SEANCES
@@ -245,6 +264,8 @@ export const api = {
     },
     delete: (id: number): Promise<void> => 
       fetch(`/seances/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
+    import: (file: File): Promise<any> => 
+      importFile('/seances/import', file),
   },
 
   // CRENEAUX
@@ -265,6 +286,8 @@ export const api = {
       }).then(handleResponse),
     delete: (id: number): Promise<void> => 
       fetch(`/creneaux/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
+    import: (file: File): Promise<any> => 
+      importFile('/creneaux/import', file),
   },
 
   // MATIERE CLASSE CONFIGS
@@ -285,5 +308,7 @@ export const api = {
       }).then(handleResponse),
     delete: (id: number): Promise<void> => 
       fetch(`/configs/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
+    import: (file: File): Promise<any> => 
+      importFile('/configs/import', file),
   }
 };

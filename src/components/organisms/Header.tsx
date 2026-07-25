@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Upload } from 'lucide-react';
 import { Button } from '../atoms/Button';
 import type { Tab } from './Sidebar';
 
@@ -8,14 +8,18 @@ interface HeaderProps {
   loading: boolean;
   onRefresh: () => void;
   onCreateClick: () => void;
+  onImportSelect?: (file: File) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ 
   activeTab, 
   loading, 
   onRefresh, 
-  onCreateClick 
+  onCreateClick,
+  onImportSelect
 }) => {
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
   const getTitle = () => {
     switch (activeTab) {
       case 'dashboard': return 'Planning de la Semaine';
@@ -25,6 +29,7 @@ export const Header: React.FC<HeaderProps> = ({
       case 'matieres': return 'Gestion des Matières';
       case 'salles': return 'Gestion des Salles';
       case 'creneaux': return 'Gestion des Créneaux Horaires';
+      case 'configs': return 'Configurations Matières/Classes';
       default: return '';
     }
   };
@@ -38,6 +43,7 @@ export const Header: React.FC<HeaderProps> = ({
       case 'matieres': return 'Catalogue des cours enseignés';
       case 'salles': return 'Locaux et capacités d\'accueil';
       case 'creneaux': return 'Plages et créneaux horaires de cours';
+      case 'configs': return 'Configurations de volume horaire par classe et matière';
       default: return '';
     }
   };
@@ -51,7 +57,20 @@ export const Header: React.FC<HeaderProps> = ({
       case 'matieres': return 'Matière';
       case 'salles': return 'Salle';
       case 'creneaux': return 'Créneau';
+      case 'configs': return 'Configuration';
       default: return '';
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && onImportSelect) {
+      onImportSelect(file);
+      e.target.value = '';
     }
   };
 
@@ -62,7 +81,24 @@ export const Header: React.FC<HeaderProps> = ({
         <p>{getDescription()}</p>
       </div>
 
-      <div style={{ display: 'flex', gap: '0.75rem' }}>
+      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+        <input 
+          type="file" 
+          ref={fileInputRef} 
+          style={{ display: 'none' }} 
+          accept=".csv" 
+          onChange={handleFileChange} 
+        />
+        {onImportSelect && (
+          <Button 
+            variant="secondary" 
+            onClick={handleImportClick} 
+            disabled={loading}
+            icon={<Upload size={16} />}
+          >
+            Importer CSV
+          </Button>
+        )}
         <Button variant="secondary" onClick={onRefresh} disabled={loading}>
           Actualiser
         </Button>

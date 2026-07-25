@@ -61,7 +61,6 @@ export const FormModal: React.FC<FormModalProps> = ({
 
   // Matiere Form States
   const [matiereNom, setMatiereNom] = useState('');
-  const [matiereVolume, setMatiereVolume] = useState(0);
 
   // Salle Form States
   const [salleCode, setSalleCode] = useState('');
@@ -85,6 +84,7 @@ export const FormModal: React.FC<FormModalProps> = ({
   const [configMatiereId, setConfigMatiereId] = useState<number | ''>('');
   const [configDateDebut, setConfigDateDebut] = useState('');
   const [configDateFin, setConfigDateFin] = useState('');
+  const [configVolumeHoraire, setConfigVolumeHoraire] = useState<number | ''>('');
 
   // Initialize or Reset Fields
   useEffect(() => {
@@ -108,7 +108,6 @@ export const FormModal: React.FC<FormModalProps> = ({
         setClasseNom(selectedItem.nom || '');
       } else if (modalEntity === 'matieres') {
         setMatiereNom(selectedItem.nom || '');
-        setMatiereVolume(selectedItem.volumeHoraireAnnuel || 0);
       } else if (modalEntity === 'salles') {
         setSalleCode(selectedItem.code || '');
         setSalleCapacite(selectedItem.capacite || 0);
@@ -136,6 +135,7 @@ export const FormModal: React.FC<FormModalProps> = ({
         setConfigMatiereId(selectedItem.matiereId || '');
         setConfigDateDebut(selectedItem.dateDebut || '');
         setConfigDateFin(selectedItem.dateFin || '');
+        setConfigVolumeHoraire(selectedItem.volumeHorairePeriode ?? '');
       }
     } else {
       // Create / reset
@@ -157,7 +157,6 @@ export const FormModal: React.FC<FormModalProps> = ({
       setClasseNom('');
 
       setMatiereNom('');
-      setMatiereVolume(0);
 
       setSalleCode('');
       setSalleCapacite(0);
@@ -186,6 +185,7 @@ export const FormModal: React.FC<FormModalProps> = ({
       setConfigMatiereId('');
       setConfigDateDebut('');
       setConfigDateFin('');
+      setConfigVolumeHoraire('');
     }
   }, [modalType, modalEntity, selectedItem, professeurs, classes, matieres, salles]);
 
@@ -252,7 +252,6 @@ export const FormModal: React.FC<FormModalProps> = ({
       const payload: Matiere = {
         id: selectedItem?.id,
         nom: matiereNom,
-        volumeHoraireAnnuel: matiereVolume
       };
       onSave(payload);
     } else if (modalEntity === 'salles') {
@@ -289,6 +288,7 @@ export const FormModal: React.FC<FormModalProps> = ({
         matiereId: configMatiereId ? Number(configMatiereId) : undefined,
         dateDebut: configDateDebut || null,
         dateFin: configDateFin || null,
+        volumeHorairePeriode: configVolumeHoraire !== '' ? Number(configVolumeHoraire) : null,
       };
       onSave(payload);
     }
@@ -473,10 +473,6 @@ export const FormModal: React.FC<FormModalProps> = ({
                 <label>Nom de la matière</label>
                 <input type="text" className="form-control" value={matiereNom} onChange={e => setMatiereNom(e.target.value)} required />
               </div>
-              <div className="form-group">
-                <label>Volume Horaire Annuel (heures)</label>
-                <input type="number" className="form-control" value={matiereVolume} onChange={e => setMatiereVolume(Number(e.target.value))} required />
-              </div>
             </>
           )}
 
@@ -628,6 +624,17 @@ export const FormModal: React.FC<FormModalProps> = ({
                   className="form-control" 
                   value={configDateFin} 
                   onChange={e => setConfigDateFin(e.target.value)} 
+                />
+              </div>
+              <div className="form-group">
+                <label>Volume Horaire Période (heures)</label>
+                <input 
+                  type="number" 
+                  min="0"
+                  className="form-control" 
+                  value={configVolumeHoraire} 
+                  onChange={e => setConfigVolumeHoraire(e.target.value !== '' ? Number(e.target.value) : '')} 
+                  placeholder="ex: 120"
                 />
               </div>
             </>

@@ -241,6 +241,35 @@ export default function App() {
     }
   };
 
+  const handleImport = async (file: File) => {
+    setLoading(true);
+    try {
+      if (activeTab === 'professeurs') {
+        await api.professeurs.import(file);
+      } else if (activeTab === 'eleves') {
+        await api.eleves.import(file);
+      } else if (activeTab === 'classes') {
+        await api.classes.import(file);
+      } else if (activeTab === 'matieres') {
+        await api.matieres.import(file);
+      } else if (activeTab === 'salles') {
+        await api.salles.import(file);
+      } else if (activeTab === 'creneaux') {
+        await api.creneaux.import(file);
+      } else if (activeTab === 'configs') {
+        await api.configs.import(file);
+      } else if (activeTab === 'dashboard') {
+        await api.seances.import(file);
+      }
+      showToast("Données importées avec succès !");
+      loadAllData();
+    } catch (err: any) {
+      showToast(err.message || "Erreur lors de l'importation du fichier CSV", 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Calendar Sessions filter calculation
   const filteredSeances = useMemo(() => {
     return seances.filter(s => {
@@ -260,12 +289,12 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="main-content">
-        {/* Header */}
         <Header 
           activeTab={activeTab} 
           loading={loading} 
           onRefresh={loadAllData} 
           onCreateClick={() => openCreateModal(activeTab)} 
+          onImportSelect={handleImport}
         />
 
         {/* Dashboard Stats */}

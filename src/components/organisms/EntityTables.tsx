@@ -304,7 +304,6 @@ export const MatieresTable: React.FC<MatieresTableProps> = ({
           <thead>
             <tr>
               <th>Nom de la Matière</th>
-              <th>Volume Horaire Annuel</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -312,9 +311,6 @@ export const MatieresTable: React.FC<MatieresTableProps> = ({
             {filtered.map(m => (
               <tr key={m.id}>
                 <td style={{ fontWeight: 600 }}>{m.nom}</td>
-                <td>
-                  <Badge variant="primary">{m.volumeHoraireAnnuel} heures</Badge>
-                </td>
                 <td className="actions-cell">
                   <Button variant="icon-edit" onClick={() => onEdit(m)} icon={<Edit2 size={16} />} />
                   <Button variant="icon-delete" onClick={() => m.id && onDelete(m.id)} icon={<Trash2 size={16} />} />
@@ -516,7 +512,7 @@ export const MatiereClasseConfigsTable: React.FC<MatiereClasseConfigsTableProps>
               <th>Matière</th>
               <th>Date de Début</th>
               <th>Date de Fin</th>
-              <th>Période</th>
+              <th>Volume Horaire</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -531,9 +527,10 @@ export const MatiereClasseConfigsTable: React.FC<MatiereClasseConfigsTableProps>
                 <td>{formatDate(c.dateDebut)}</td>
                 <td>{formatDate(c.dateFin)}</td>
                 <td>
-                  <Badge variant="primary">
-                    {c.dateDebut ? formatDate(c.dateDebut) : '∞'} ➔ {c.dateFin ? formatDate(c.dateFin) : '∞'}
-                  </Badge>
+                  {c.volumeHorairePeriode != null
+                    ? <Badge variant="primary">{c.volumeHorairePeriode} h</Badge>
+                    : <span style={{ color: 'var(--text-muted)' }}>-</span>
+                  }
                 </td>
                 <td className="actions-cell">
                   <Button variant="icon-edit" onClick={() => onEdit(c)} icon={<Edit2 size={16} />} />
