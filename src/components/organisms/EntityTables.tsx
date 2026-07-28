@@ -182,6 +182,7 @@ export const ClassesTable: React.FC<ClassesTableProps> = ({
             <tr>
               <th>ID</th>
               <th>Nom de la Classe</th>
+              <th>Périodes de présence</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -190,6 +191,19 @@ export const ClassesTable: React.FC<ClassesTableProps> = ({
               <tr key={c.id}>
                 <td>#{c.id}</td>
                 <td style={{ fontWeight: 600 }}>{c.nom}</td>
+                <td>
+                  {c.presences && c.presences.length > 0 ? (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
+                      {c.presences.map((p, idx) => (
+                        <Badge key={p.id || idx} variant="success">
+                          📅 Du {new Date(p.dateDebut).toLocaleDateString('fr-FR')} au {new Date(p.dateFin).toLocaleDateString('fr-FR')}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Aucune</span>
+                  )}
+                </td>
                 <td className="actions-cell">
                   <Button variant="icon-edit" onClick={() => onEdit(c)} icon={<Edit2 size={16} />} />
                   <Button variant="icon-delete" onClick={() => c.id && onDelete(c.id)} icon={<Trash2 size={16} />} />

@@ -32,9 +32,16 @@ export interface Eleve {
   classeId?: number; // Internal frontend field to trace association
 }
 
+export interface ClassePresence {
+  id?: number;
+  dateDebut: string;
+  dateFin: string;
+}
+
 export interface Classe {
   id?: number;
   nom: string;
+  presences?: ClassePresence[];
 }
 
 export interface Matiere {

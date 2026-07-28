@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Trash2 } from 'lucide-react';
 import { Button } from '../atoms/Button';
 import type { Tab } from './Sidebar';
-import type { Professeur, Eleve, Classe, Matiere, Salle, Seance, ProfesseurDayOff, Creneau, MatiereClasseConfig } from '../../services/api';
+import type { Professeur, Eleve, Classe, Matiere, Salle, Seance, ProfesseurDayOff, Creneau, MatiereClasseConfig, ClassePresence } from '../../services/api';
 
 interface FormModalProps {
   modalType: 'create' | 'edit';
@@ -58,6 +58,7 @@ export const FormModal: React.FC<FormModalProps> = ({
 
   // Classe Form States
   const [classeNom, setClasseNom] = useState('');
+  const [classePresences, setClassePresences] = useState<ClassePresence[]>([]);
 
   // Matiere Form States
   const [matiereNom, setMatiereNom] = useState('');
@@ -106,6 +107,7 @@ export const FormModal: React.FC<FormModalProps> = ({
         setEleveClasseId(selectedItem.classeId || '');
       } else if (modalEntity === 'classes') {
         setClasseNom(selectedItem.nom || '');
+        setClassePresences(selectedItem.presences || []);
       } else if (modalEntity === 'matieres') {
         setMatiereNom(selectedItem.nom || '');
       } else if (modalEntity === 'salles') {
@@ -155,6 +157,7 @@ export const FormModal: React.FC<FormModalProps> = ({
       setEleveClasseId('');
 
       setClasseNom('');
+      setClassePresences([]);
 
       setMatiereNom('');
 
@@ -245,7 +248,8 @@ export const FormModal: React.FC<FormModalProps> = ({
     } else if (modalEntity === 'classes') {
       const payload: Classe = {
         id: selectedItem?.id,
-        nom: classeNom
+        nom: classeNom,
+        presences: classePresences
       };
       onSave(payload);
     } else if (modalEntity === 'matieres') {
@@ -460,10 +464,73 @@ export const FormModal: React.FC<FormModalProps> = ({
 
           {/* CLASSE FORM FIELDS */}
           {modalEntity === 'classes' && (
-            <div className="form-group">
-              <label>Nom de la classe</label>
-              <input type="text" className="form-control" placeholder="ex: Terminale S1" value={classeNom} onChange={e => setClasseNom(e.target.value)} required />
-            </div>
+            <>
+              <div className="form-group">
+                <label>Nom de la classe</label>
+                <input type="text" className="form-control" placeholder="ex: Terminale S1" value={classeNom} onChange={e => setClasseNom(e.target.value)} required />
+              </div>
+
+              <div className="form-group">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <label style={{ margin: 0 }}>Périodes de Présence</label>
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem' }}
+                    onClick={() => setClassePresences([...classePresences, { dateDebut: '', dateFin: '' }])}
+                  >
+                    + Ajouter une période
+                  </button>
+                </div>
+
+                {classePresences.length === 0 ? (
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Aucune période configurée.</p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    {classePresences.map((p, idx) => (
+                      <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <input
+                          type="date"
+                          className="form-control"
+                          value={p.dateDebut}
+                          onChange={e => {
+                            const newPresences = [...classePresences];
+                            newPresences[idx].dateDebut = e.target.value;
+                            setClassePresences(newPresences);
+                          }}
+                          required
+                        />
+                        <span style={{ color: 'var(--text-muted)' }}>au</span>
+                        <input
+                          type="date"
+                          className="form-control"
+                          value={p.dateFin}
+                          onChange={e => {
+                            const newPresences = [...classePresences];
+                            newPresences[idx].dateFin = e.target.value;
+                            setClassePresences(newPresences);
+                          }}
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setClassePresences(classePresences.filter((_, i) => i !== idx))}
+                          style={{
+                            border: 'none',
+                            background: 'none',
+                            color: 'var(--danger)',
+                            cursor: 'pointer',
+                            padding: '0.25rem'
+                          }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
           )}
 
           {/* MATIERE FORM FIELDS */}
