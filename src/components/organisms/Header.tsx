@@ -30,6 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
       case 'salles': return 'Gestion des Salles';
       case 'creneaux': return 'Gestion des Créneaux Horaires';
       case 'configs': return 'Configurations Matières/Classes';
+      case 'vacances': return 'Gestion des Vacances';
       default: return '';
     }
   };
@@ -44,6 +45,7 @@ export const Header: React.FC<HeaderProps> = ({
       case 'salles': return 'Locaux et capacités d\'accueil';
       case 'creneaux': return 'Plages et créneaux horaires de cours';
       case 'configs': return 'Configurations de volume horaire par classe et matière';
+      case 'vacances': return 'Calendrier des vacances scolaires et jours fériés';
       default: return '';
     }
   };
@@ -58,6 +60,7 @@ export const Header: React.FC<HeaderProps> = ({
       case 'salles': return 'Salle';
       case 'creneaux': return 'Créneau';
       case 'configs': return 'Configuration';
+      case 'vacances': return 'Période';
       default: return '';
     }
   };

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Trash2 } from 'lucide-react';
 import { Button } from '../atoms/Button';
 import type { Tab } from './Sidebar';
-import type { Professeur, Eleve, Classe, Matiere, Salle, Seance, ProfesseurDayOff, Creneau, MatiereClasseConfig, ClassePresence } from '../../services/api';
+import type { Professeur, Eleve, Classe, Matiere, Salle, Seance, ProfesseurDayOff, Creneau, MatiereClasseConfig, ClassePresence, Vacances } from '../../services/api';
 
 interface FormModalProps {
   modalType: 'create' | 'edit';
@@ -87,6 +87,11 @@ export const FormModal: React.FC<FormModalProps> = ({
   const [configDateFin, setConfigDateFin] = useState('');
   const [configVolumeHoraire, setConfigVolumeHoraire] = useState<number | ''>('');
 
+  // Vacances Form States
+  const [vacancesNom, setVacancesNom] = useState('');
+  const [vacancesDateDebut, setVacancesDateDebut] = useState('');
+  const [vacancesDateFin, setVacancesDateFin] = useState('');
+
   // Initialize or Reset Fields
   useEffect(() => {
     if (modalType === 'edit' && selectedItem) {
@@ -138,6 +143,10 @@ export const FormModal: React.FC<FormModalProps> = ({
         setConfigDateDebut(selectedItem.dateDebut || '');
         setConfigDateFin(selectedItem.dateFin || '');
         setConfigVolumeHoraire(selectedItem.volumeHorairePeriode ?? '');
+      } else if (modalEntity === 'vacances') {
+        setVacancesNom(selectedItem.nom || '');
+        setVacancesDateDebut(selectedItem.dateDebut || '');
+        setVacancesDateFin(selectedItem.dateFin || '');
       }
     } else {
       // Create / reset
@@ -189,6 +198,10 @@ export const FormModal: React.FC<FormModalProps> = ({
       setConfigDateDebut('');
       setConfigDateFin('');
       setConfigVolumeHoraire('');
+
+      setVacancesNom('');
+      setVacancesDateDebut('');
+      setVacancesDateFin('');
     }
   }, [modalType, modalEntity, selectedItem, professeurs, classes, matieres, salles]);
 
@@ -295,6 +308,14 @@ export const FormModal: React.FC<FormModalProps> = ({
         volumeHorairePeriode: configVolumeHoraire !== '' ? Number(configVolumeHoraire) : null,
       };
       onSave(payload);
+    } else if (modalEntity === 'vacances') {
+      const payload: Vacances = {
+        id: selectedItem?.id,
+        nom: vacancesNom,
+        dateDebut: vacancesDateDebut,
+        dateFin: vacancesDateFin
+      };
+      onSave(payload);
     }
   };
 
@@ -309,6 +330,7 @@ export const FormModal: React.FC<FormModalProps> = ({
       case 'salles': return `${action} : Salle`;
       case 'creneaux': return `${action} : Créneau Horaire`;
       case 'configs': return `${action} : Config. Matière`;
+      case 'vacances': return `${action} : Période de vacances`;
       default: return '';
     }
   };
@@ -702,6 +724,43 @@ export const FormModal: React.FC<FormModalProps> = ({
                   value={configVolumeHoraire} 
                   onChange={e => setConfigVolumeHoraire(e.target.value !== '' ? Number(e.target.value) : '')} 
                   placeholder="ex: 120"
+                />
+              </div>
+            </>
+          )}
+
+          {/* VACANCES FORM FIELDS */}
+          {modalEntity === 'vacances' && (
+            <>
+              <div className="form-group">
+                <label>Nom des vacances / jour férié</label>
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  placeholder="ex: Vacances de la Toussaint" 
+                  value={vacancesNom} 
+                  onChange={e => setVacancesNom(e.target.value)} 
+                  required 
+                />
+              </div>
+              <div className="form-group">
+                <label>Date de Début</label>
+                <input 
+                  type="date" 
+                  className="form-control" 
+                  value={vacancesDateDebut} 
+                  onChange={e => setVacancesDateDebut(e.target.value)} 
+                  required 
+                />
+              </div>
+              <div className="form-group">
+                <label>Date de Fin</label>
+                <input 
+                  type="date" 
+                  className="form-control" 
+                  value={vacancesDateFin} 
+                  onChange={e => setVacancesDateFin(e.target.value)} 
+                  required 
                 />
               </div>
             </>

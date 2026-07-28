@@ -1,8 +1,8 @@
 import React from 'react';
-import { Search, Edit2, Trash2, GraduationCap, Users, UserCheck, BookOpen, Home, Clock, Sliders } from 'lucide-react';
+import { Search, Edit2, Trash2, GraduationCap, Users, UserCheck, BookOpen, Home, Clock, Sliders, Calendar } from 'lucide-react';
 import { Badge } from '../atoms/Badge';
 import { Button } from '../atoms/Button';
-import type { Professeur, Eleve, Classe, Matiere, Salle, Creneau, MatiereClasseConfig } from '../../services/api';
+import type { Professeur, Eleve, Classe, Matiere, Salle, Creneau, MatiereClasseConfig, Vacances } from '../../services/api';
 
 interface TableHeaderProps {
   title: string;
@@ -558,4 +558,69 @@ export const MatiereClasseConfigsTable: React.FC<MatiereClasseConfigsTableProps>
     </div>
   );
 };
+
+// 8. VACANCES TABLE
+interface VacancesTableProps {
+  vacances: Vacances[];
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+  onEdit: (vacances: Vacances) => void;
+  onDelete: (id: number) => void;
+}
+
+export const VacancesTable: React.FC<VacancesTableProps> = ({
+  vacances,
+  searchTerm,
+  onSearchChange,
+  onEdit,
+  onDelete,
+}) => {
+  const filtered = vacances.filter(v => 
+    v.nom.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div className="table-card">
+      <TableHeader 
+        title={`Périodes de vacances (${vacances.length})`}
+        searchTerm={searchTerm}
+        onSearchChange={onSearchChange}
+        placeholder="Rechercher par nom..."
+      />
+
+      {filtered.length === 0 ? (
+        <div className="empty-state">
+          <Calendar className="empty-state-icon" />
+          <h3>Aucune période de vacances trouvée</h3>
+          <p>Ajoutez des vacances scolaires ou jours fériés.</p>
+        </div>
+      ) : (
+        <table className="custom-table">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Date de début</th>
+              <th>Date de fin</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map(v => (
+              <tr key={v.id}>
+                <td style={{ fontWeight: 600 }}>{v.nom}</td>
+                <td>📅 {new Date(v.dateDebut).toLocaleDateString('fr-FR')}</td>
+                <td>📅 {new Date(v.dateFin).toLocaleDateString('fr-FR')}</td>
+                <td className="actions-cell">
+                  <Button variant="icon-edit" onClick={() => onEdit(v)} icon={<Edit2 size={16} />} />
+                  <Button variant="icon-delete" onClick={() => v.id && onDelete(v.id)} icon={<Trash2 size={16} />} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+};
+
 

@@ -14,7 +14,8 @@ import type {
   Salle, 
   Seance,
   Creneau,
-  MatiereClasseConfig
+  MatiereClasseConfig,
+  Vacances
 } from './services/api';
 
 // Components
@@ -31,7 +32,8 @@ import {
   MatieresTable, 
   SallesTable,
   CreneauxTable,
-  MatiereClasseConfigsTable
+  MatiereClasseConfigsTable,
+  VacancesTable
 } from './components/organisms/EntityTables';
 
 import './App.css';
@@ -49,6 +51,7 @@ export default function App() {
   const [seances, setSeances] = useState<Seance[]>([]);
   const [creneaux, setCreneaux] = useState<Creneau[]>([]);
   const [matiereClasseConfigs, setMatiereClasseConfigs] = useState<MatiereClasseConfig[]>([]);
+  const [vacances, setVacances] = useState<Vacances[]>([]);
   
   // Loading & Error States
   const [loading, setLoading] = useState(false);
@@ -75,7 +78,7 @@ export default function App() {
   const loadAllData = async () => {
     setLoading(true);
     try {
-      const [profsData, elevesData, classesData, matieresData, sallesData, seancesData, creneauxData, configsData] = await Promise.all([
+      const [profsData, elevesData, classesData, matieresData, sallesData, seancesData, creneauxData, configsData, vacancesData] = await Promise.all([
         api.professeurs.list().catch(() => []),
         api.eleves.listAll().catch(() => []),
         api.classes.list().catch(() => []),
@@ -83,7 +86,8 @@ export default function App() {
         api.salles.list().catch(() => []),
         api.seances.list().catch(() => []),
         api.creneaux.list().catch(() => []),
-        api.configs.list().catch(() => [])
+        api.configs.list().catch(() => []),
+        api.vacances.list().catch(() => [])
       ]);
 
       setProfesseurs(profsData);
@@ -94,6 +98,7 @@ export default function App() {
       setSeances(seancesData);
       setCreneaux(creneauxData);
       setMatiereClasseConfigs(configsData);
+      setVacances(vacancesData);
     } catch (err: any) {
       showToast("Erreur lors de la récupération des données", 'error');
     } finally {
@@ -192,6 +197,14 @@ export default function App() {
           await api.configs.update(payload);
           showToast("Configuration mise à jour !");
         }
+      } else if (modalEntity === 'vacances') {
+        if (modalType === 'create') {
+          await api.vacances.create(payload);
+          showToast("Période de vacances créée !");
+        } else {
+          await api.vacances.update(payload);
+          showToast("Période de vacances mise à jour !");
+        }
       } else if (modalEntity === 'dashboard') {
         const pId = associationIds?.professeurId;
         const cId = associationIds?.classeId;
@@ -228,6 +241,7 @@ export default function App() {
       else if (entity === 'salles') await api.salles.delete(id);
       else if (entity === 'creneaux') await api.creneaux.delete(id);
       else if (entity === 'configs') await api.configs.delete(id);
+      else if (entity === 'vacances') await api.vacances.delete(id);
       else if (entity === 'dashboard') await api.seances.delete(id);
 
       showToast("Élément supprimé avec succès !");
@@ -294,7 +308,7 @@ export default function App() {
           loading={loading} 
           onRefresh={loadAllData} 
           onCreateClick={() => openCreateModal(activeTab)} 
-          onImportSelect={handleImport}
+          onImportSelect={activeTab !== 'vacances' ? handleImport : undefined}
         />
 
         {/* Dashboard Stats */}
@@ -388,6 +402,16 @@ export default function App() {
             onSearchChange={setSearchTerm} 
             onEdit={(c) => openEditModal('configs', c)} 
             onDelete={(id) => handleDelete('configs', id)} 
+          />
+        )}
+
+        {activeTab === 'vacances' && (
+          <VacancesTable 
+            vacances={vacances} 
+            searchTerm={searchTerm} 
+            onSearchChange={setSearchTerm} 
+            onEdit={(v) => openEditModal('vacances', v)} 
+            onDelete={(id) => handleDelete('vacances', id)} 
           />
         )}
       </main>

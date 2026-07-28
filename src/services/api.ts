@@ -44,6 +44,13 @@ export interface Classe {
   presences?: ClassePresence[];
 }
 
+export interface Vacances {
+  id?: number;
+  nom: string;
+  dateDebut: string;
+  dateFin: string;
+}
+
 export interface Matiere {
   id?: number;
   nom: string;
@@ -317,5 +324,25 @@ export const api = {
       fetch(`/configs/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
     import: (file: File): Promise<any> => 
       importFile('/configs/import', file),
+  },
+
+  // VACANCES
+  vacances: {
+    list: (): Promise<Vacances[]> => 
+      fetch('/vacances/list').then(handleResponse),
+    create: (data: Vacances): Promise<Vacances> => 
+      fetch('/vacances/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(handleResponse),
+    update: (data: Vacances): Promise<Vacances> => 
+      fetch('/vacances/update', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(handleResponse),
+    delete: (id: number): Promise<void> => 
+      fetch(`/vacances/delete/${id}`, { method: 'DELETE' }).then(handleResponse)
   }
 };
