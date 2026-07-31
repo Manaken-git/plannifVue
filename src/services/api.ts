@@ -115,6 +115,26 @@ const importFile = (url: string, file: File): Promise<any> => {
   }).then(handleResponse);
 };
 
+const exportFile = (url: string, filename: string): Promise<void> => {
+  return fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Erreur lors de l'exportation");
+      }
+      return response.blob();
+    })
+    .then(blob => {
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+    });
+};
+
 export const api = {
   // PROFESSEURS
   professeurs: {
@@ -136,6 +156,8 @@ export const api = {
       fetch(`/profs/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
     import: (file: File): Promise<any> => 
       importFile('/profs/import', file),
+    export: (): Promise<void> =>
+      exportFile('/profs/export', 'professeurs.csv'),
   },
 
   // ELEVES
@@ -164,6 +186,8 @@ export const api = {
       fetch(`/eleves/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
     import: (file: File): Promise<any> => 
       importFile('/eleves/import', file),
+    export: (): Promise<void> =>
+      exportFile('/eleves/export', 'eleves.csv'),
   },
 
   // CLASSES
@@ -186,6 +210,8 @@ export const api = {
       fetch(`/classes/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
     import: (file: File): Promise<any> => 
       importFile('/classes/import', file),
+    export: (): Promise<void> =>
+      exportFile('/classes/export', 'classes.csv'),
   },
 
   // MATIERES
@@ -208,6 +234,8 @@ export const api = {
       fetch(`/matieres/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
     import: (file: File): Promise<any> => 
       importFile('/matieres/import', file),
+    export: (): Promise<void> =>
+      exportFile('/matieres/export', 'matieres.csv'),
   },
 
   // SALLES
@@ -230,6 +258,8 @@ export const api = {
       fetch(`/salles/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
     import: (file: File): Promise<any> => 
       importFile('/salles/import', file),
+    export: (): Promise<void> =>
+      exportFile('/salles/export', 'salles.csv'),
   },
 
   // SEANCES
@@ -280,6 +310,8 @@ export const api = {
       fetch(`/seances/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
     import: (file: File): Promise<any> => 
       importFile('/seances/import', file),
+    export: (): Promise<void> =>
+      exportFile('/seances/export', 'seances.csv'),
   },
 
   // CRENEAUX
@@ -302,6 +334,8 @@ export const api = {
       fetch(`/creneaux/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
     import: (file: File): Promise<any> => 
       importFile('/creneaux/import', file),
+    export: (): Promise<void> =>
+      exportFile('/creneaux/export', 'creneaux.csv'),
   },
 
   // MATIERE CLASSE CONFIGS
@@ -324,6 +358,8 @@ export const api = {
       fetch(`/configs/delete/${id}`, { method: 'DELETE' }).then(handleResponse),
     import: (file: File): Promise<any> => 
       importFile('/configs/import', file),
+    export: (): Promise<void> =>
+      exportFile('/configs/export', 'configurations.csv'),
   },
 
   // VACANCES

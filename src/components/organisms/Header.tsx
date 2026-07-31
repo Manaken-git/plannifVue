@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Upload } from 'lucide-react';
+import { Plus, Upload, Download } from 'lucide-react';
 import { Button } from '../atoms/Button';
 import type { Tab } from './Sidebar';
 
@@ -9,6 +9,7 @@ interface HeaderProps {
   onRefresh: () => void;
   onCreateClick: () => void;
   onImportSelect?: (file: File) => void;
+  onExportClick?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ 
@@ -16,7 +17,8 @@ export const Header: React.FC<HeaderProps> = ({
   loading, 
   onRefresh, 
   onCreateClick,
-  onImportSelect
+  onImportSelect,
+  onExportClick
 }) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -100,6 +102,16 @@ export const Header: React.FC<HeaderProps> = ({
             icon={<Upload size={16} />}
           >
             Importer CSV
+          </Button>
+        )}
+        {onExportClick && (
+          <Button 
+            variant="secondary" 
+            onClick={onExportClick} 
+            disabled={loading}
+            icon={<Download size={16} />}
+          >
+            Exporter CSV
           </Button>
         )}
         <Button variant="secondary" onClick={onRefresh} disabled={loading}>

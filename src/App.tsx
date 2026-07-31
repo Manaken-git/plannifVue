@@ -284,6 +284,34 @@ export default function App() {
     }
   };
 
+  const handleExport = async () => {
+    setLoading(true);
+    try {
+      if (activeTab === 'professeurs') {
+        await api.professeurs.export();
+      } else if (activeTab === 'eleves') {
+        await api.eleves.export();
+      } else if (activeTab === 'classes') {
+        await api.classes.export();
+      } else if (activeTab === 'matieres') {
+        await api.matieres.export();
+      } else if (activeTab === 'salles') {
+        await api.salles.export();
+      } else if (activeTab === 'creneaux') {
+        await api.creneaux.export();
+      } else if (activeTab === 'configs') {
+        await api.configs.export();
+      } else if (activeTab === 'dashboard') {
+        await api.seances.export();
+      }
+      showToast("Données exportées avec succès !");
+    } catch (err: any) {
+      showToast(err.message || "Erreur lors de l'exportation du fichier CSV", 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Calendar Sessions filter calculation
   const filteredSeances = useMemo(() => {
     return seances.filter(s => {
@@ -309,6 +337,7 @@ export default function App() {
           onRefresh={loadAllData} 
           onCreateClick={() => openCreateModal(activeTab)} 
           onImportSelect={activeTab !== 'vacances' ? handleImport : undefined}
+          onExportClick={activeTab !== 'vacances' ? handleExport : undefined}
         />
 
         {/* Dashboard Stats */}
