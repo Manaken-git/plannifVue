@@ -1,8 +1,73 @@
-import React from 'react';
-import { Search, Edit2, Trash2, GraduationCap, Users, UserCheck, BookOpen, Home, Clock, Sliders, Calendar } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { 
+  Search, Edit2, Trash2, GraduationCap, Users, UserCheck, BookOpen, Home, Clock, Sliders, Calendar,
+  ArrowUpDown, ArrowUp, ArrowDown 
+} from 'lucide-react';
 import { Badge } from '../atoms/Badge';
 import { Button } from '../atoms/Button';
 import type { Professeur, Eleve, Classe, Matiere, Salle, Creneau, MatiereClasseConfig, Vacances } from '../../services/api';
+
+interface SortConfig {
+  key: string;
+  direction: 'asc' | 'desc' | null;
+}
+
+function useSortableData<T>(
+  items: T[],
+  selectors: Record<string, (item: T) => any>,
+  defaultConfig: SortConfig = { key: '', direction: null }
+) {
+  const [sortConfig, setSortConfig] = useState<SortConfig>(defaultConfig);
+
+  const sortedItems = useMemo(() => {
+    if (!sortConfig.key || !sortConfig.direction) return items;
+
+    const selector = selectors[sortConfig.key];
+    if (!selector) return items;
+
+    return [...items].sort((a, b) => {
+      const aVal = selector(a);
+      const bVal = selector(b);
+
+      if (aVal === undefined || aVal === null) return 1;
+      if (bVal === undefined || bVal === null) return -1;
+
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return sortConfig.direction === 'asc'
+          ? aVal.localeCompare(bVal, 'fr', { sensitivity: 'base' })
+          : bVal.localeCompare(aVal, 'fr', { sensitivity: 'base' });
+      }
+
+      if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [items, sortConfig, selectors]);
+
+  const requestSort = (key: string) => {
+    let direction: 'asc' | 'desc' | null = 'asc';
+    if (sortConfig.key === key) {
+      if (sortConfig.direction === 'asc') {
+        direction = 'desc';
+      } else if (sortConfig.direction === 'desc') {
+        direction = null;
+      }
+    }
+    setSortConfig({ key, direction });
+  };
+
+  return { items: sortedItems, requestSort, sortConfig };
+}
+
+const SortHeaderIcon: React.FC<{ sortConfig: SortConfig; columnKey: string }> = ({ sortConfig, columnKey }) => {
+  if (sortConfig.key !== columnKey || !sortConfig.direction) {
+    return <ArrowUpDown size={14} className="sort-icon" />;
+  }
+  if (sortConfig.direction === 'asc') {
+    return <ArrowUp size={14} className="sort-icon active" />;
+  }
+  return <ArrowDown size={14} className="sort-icon active" />;
+};
 
 interface TableHeaderProps {
   title: string;
@@ -53,6 +118,17 @@ export const ProfesseursTable: React.FC<ProfesseursTableProps> = ({
     `${p.nom} ${p.prenom}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const selectors = useMemo<Record<string, (p: Professeur) => any>>(() => ({
+    nom: p => `${p.nom} ${p.prenom}`,
+    email: p => p.email || '',
+    nb_heures: p => p.nb_heures || 0,
+    matieres: p => (p.matieres || []).map(m => m.nom).join(', '),
+    plage: p => p.plageHorairePreferee?.libelle || '',
+    daysOff: p => (p.daysOff || []).length,
+  }), []);
+
+  const { items: sorted, requestSort, sortConfig } = useSortableData(filtered, selectors);
+
   return (
     <div className="table-card">
       <TableHeader 
@@ -71,17 +147,29 @@ export const ProfesseursTable: React.FC<ProfesseursTableProps> = ({
         <table className="custom-table">
           <thead>
             <tr>
-              <th>Nom & Prénom</th>
-              <th>Email</th>
-              <th>Volume & Contraintes</th>
-              <th>Matières Enseignées</th>
-              <th>Plage Horaire Préférée</th>
-              <th>Jours Off</th>
+              <th className="sortable" onClick={() => requestSort('nom')}>
+                <div className="th-content">Nom & Prénom <SortHeaderIcon sortConfig={sortConfig} columnKey="nom" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('email')}>
+                <div className="th-content">Email <SortHeaderIcon sortConfig={sortConfig} columnKey="email" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('nb_heures')}>
+                <div className="th-content">Volume & Contraintes <SortHeaderIcon sortConfig={sortConfig} columnKey="nb_heures" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('matieres')}>
+                <div className="th-content">Matières Enseignées <SortHeaderIcon sortConfig={sortConfig} columnKey="matieres" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('plage')}>
+                <div className="th-content">Plage Horaire Préférée <SortHeaderIcon sortConfig={sortConfig} columnKey="plage" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('daysOff')}>
+                <div className="th-content">Jours Off <SortHeaderIcon sortConfig={sortConfig} columnKey="daysOff" /></div>
+              </th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map(p => (
+            {sorted.map(p => (
               <tr key={p.id}>
                 <td style={{ fontWeight: 600 }}>{p.nom} {p.prenom}</td>
                 <td>{p.email}</td>
@@ -162,6 +250,14 @@ export const ClassesTable: React.FC<ClassesTableProps> = ({
     c.nom.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const selectors = useMemo<Record<string, (c: Classe) => any>>(() => ({
+    id: c => c.id || 0,
+    nom: c => c.nom || '',
+    presences: c => c.presences?.[0]?.dateDebut || '',
+  }), []);
+
+  const { items: sorted, requestSort, sortConfig } = useSortableData(filtered, selectors);
+
   return (
     <div className="table-card">
       <TableHeader 
@@ -180,14 +276,20 @@ export const ClassesTable: React.FC<ClassesTableProps> = ({
         <table className="custom-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Nom de la Classe</th>
-              <th>Périodes de présence</th>
+              <th className="sortable" onClick={() => requestSort('id')} style={{ width: '80px' }}>
+                <div className="th-content">ID <SortHeaderIcon sortConfig={sortConfig} columnKey="id" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('nom')}>
+                <div className="th-content">Nom de la Classe <SortHeaderIcon sortConfig={sortConfig} columnKey="nom" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('presences')}>
+                <div className="th-content">Périodes de présence <SortHeaderIcon sortConfig={sortConfig} columnKey="presences" /></div>
+              </th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map(c => (
+            {sorted.map(c => (
               <tr key={c.id}>
                 <td>#{c.id}</td>
                 <td style={{ fontWeight: 600 }}>{c.nom}</td>
@@ -237,6 +339,13 @@ export const ElevesTable: React.FC<ElevesTableProps> = ({
     `${e.nom} ${e.prenom}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const selectors = useMemo<Record<string, (e: Eleve) => any>>(() => ({
+    nom: e => e.nom || '',
+    prenom: e => e.prenom || '',
+  }), []);
+
+  const { items: sorted, requestSort, sortConfig } = useSortableData(filtered, selectors);
+
   return (
     <div className="table-card">
       <TableHeader 
@@ -256,13 +365,17 @@ export const ElevesTable: React.FC<ElevesTableProps> = ({
         <table className="custom-table">
           <thead>
             <tr>
-              <th>Nom</th>
-              <th>Prénom</th>
+              <th className="sortable" onClick={() => requestSort('nom')}>
+                <div className="th-content">Nom <SortHeaderIcon sortConfig={sortConfig} columnKey="nom" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('prenom')}>
+                <div className="th-content">Prénom <SortHeaderIcon sortConfig={sortConfig} columnKey="prenom" /></div>
+              </th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map(e => (
+            {sorted.map(e => (
               <tr key={e.id}>
                 <td style={{ fontWeight: 600 }}>{e.nom}</td>
                 <td>{e.prenom}</td>
@@ -299,6 +412,12 @@ export const MatieresTable: React.FC<MatieresTableProps> = ({
     m.nom.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const selectors = useMemo<Record<string, (m: Matiere) => any>>(() => ({
+    nom: m => m.nom || '',
+  }), []);
+
+  const { items: sorted, requestSort, sortConfig } = useSortableData(filtered, selectors);
+
   return (
     <div className="table-card">
       <TableHeader 
@@ -317,12 +436,14 @@ export const MatieresTable: React.FC<MatieresTableProps> = ({
         <table className="custom-table">
           <thead>
             <tr>
-              <th>Nom de la Matière</th>
+              <th className="sortable" onClick={() => requestSort('nom')}>
+                <div className="th-content">Nom de la Matière <SortHeaderIcon sortConfig={sortConfig} columnKey="nom" /></div>
+              </th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map(m => (
+            {sorted.map(m => (
               <tr key={m.id}>
                 <td style={{ fontWeight: 600 }}>{m.nom}</td>
                 <td className="actions-cell">
@@ -358,6 +479,14 @@ export const SallesTable: React.FC<SallesTableProps> = ({
     s.code.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const selectors = useMemo<Record<string, (s: Salle) => any>>(() => ({
+    code: s => s.code || '',
+    capacite: s => s.capacite || 0,
+    type: s => s.type || '',
+  }), []);
+
+  const { items: sorted, requestSort, sortConfig } = useSortableData(filtered, selectors);
+
   return (
     <div className="table-card">
       <TableHeader 
@@ -376,14 +505,20 @@ export const SallesTable: React.FC<SallesTableProps> = ({
         <table className="custom-table">
           <thead>
             <tr>
-              <th>Code Salle</th>
-              <th>Capacité d'accueil</th>
-              <th>Type</th>
+              <th className="sortable" onClick={() => requestSort('code')}>
+                <div className="th-content">Code Salle <SortHeaderIcon sortConfig={sortConfig} columnKey="code" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('capacite')}>
+                <div className="th-content">Capacité d'accueil <SortHeaderIcon sortConfig={sortConfig} columnKey="capacite" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('type')}>
+                <div className="th-content">Type <SortHeaderIcon sortConfig={sortConfig} columnKey="type" /></div>
+              </th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map(s => (
+            {sorted.map(s => (
               <tr key={s.id}>
                 <td style={{ fontWeight: 600 }}>{s.code}</td>
                 <td>
@@ -423,6 +558,15 @@ export const CreneauxTable: React.FC<CreneauxTableProps> = ({
     `${c.debut} - ${c.fin}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const selectors = useMemo<Record<string, (c: Creneau) => any>>(() => ({
+    id: c => c.id || 0,
+    debut: c => c.debut || '',
+    fin: c => c.fin || '',
+    plage: c => c.debut || '',
+  }), []);
+
+  const { items: sorted, requestSort, sortConfig } = useSortableData(filtered, selectors);
+
   return (
     <div className="table-card">
       <TableHeader 
@@ -442,15 +586,23 @@ export const CreneauxTable: React.FC<CreneauxTableProps> = ({
         <table className="custom-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Heure de Début</th>
-              <th>Heure de Fin</th>
-              <th>Plage Horaire</th>
+              <th className="sortable" onClick={() => requestSort('id')} style={{ width: '80px' }}>
+                <div className="th-content">ID <SortHeaderIcon sortConfig={sortConfig} columnKey="id" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('debut')}>
+                <div className="th-content">Heure de Début <SortHeaderIcon sortConfig={sortConfig} columnKey="debut" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('fin')}>
+                <div className="th-content">Heure de Fin <SortHeaderIcon sortConfig={sortConfig} columnKey="fin" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('plage')}>
+                <div className="th-content">Plage Horaire <SortHeaderIcon sortConfig={sortConfig} columnKey="plage" /></div>
+              </th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map(c => (
+            {sorted.map(c => (
               <tr key={c.id}>
                 <td>#{c.id}</td>
                 <td style={{ fontWeight: 600 }}>{c.debut}</td>
@@ -492,6 +644,17 @@ export const MatiereClasseConfigsTable: React.FC<MatiereClasseConfigsTableProps>
     (c.matiereNom || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const selectors = useMemo<Record<string, (c: MatiereClasseConfig) => any>>(() => ({
+    id: c => c.id || 0,
+    classeNom: c => c.classeNom || '',
+    matiereNom: c => c.matiereNom || '',
+    dateDebut: c => c.dateDebut || '',
+    dateFin: c => c.dateFin || '',
+    volumeHoraire: c => c.volumeHorairePeriode || 0,
+  }), []);
+
+  const { items: sorted, requestSort, sortConfig } = useSortableData(filtered, selectors);
+
   const formatDate = (dateStr: string | null | undefined) => {
     if (!dateStr) return 'Non définie';
     try {
@@ -521,17 +684,29 @@ export const MatiereClasseConfigsTable: React.FC<MatiereClasseConfigsTableProps>
         <table className="custom-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Classe</th>
-              <th>Matière</th>
-              <th>Date de Début</th>
-              <th>Date de Fin</th>
-              <th>Volume Horaire</th>
+              <th className="sortable" onClick={() => requestSort('id')} style={{ width: '80px' }}>
+                <div className="th-content">ID <SortHeaderIcon sortConfig={sortConfig} columnKey="id" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('classeNom')}>
+                <div className="th-content">Classe <SortHeaderIcon sortConfig={sortConfig} columnKey="classeNom" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('matiereNom')}>
+                <div className="th-content">Matière <SortHeaderIcon sortConfig={sortConfig} columnKey="matiereNom" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('dateDebut')}>
+                <div className="th-content">Date de Début <SortHeaderIcon sortConfig={sortConfig} columnKey="dateDebut" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('dateFin')}>
+                <div className="th-content">Date de Fin <SortHeaderIcon sortConfig={sortConfig} columnKey="dateFin" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('volumeHoraire')}>
+                <div className="th-content">Volume Horaire <SortHeaderIcon sortConfig={sortConfig} columnKey="volumeHoraire" /></div>
+              </th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map(c => (
+            {sorted.map(c => (
               <tr key={c.id}>
                 <td>#{c.id}</td>
                 <td style={{ fontWeight: 600 }}>{c.classeNom || `Classe ID: ${c.classeId}`}</td>
@@ -579,6 +754,14 @@ export const VacancesTable: React.FC<VacancesTableProps> = ({
     v.nom.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const selectors = useMemo<Record<string, (v: Vacances) => any>>(() => ({
+    nom: v => v.nom || '',
+    dateDebut: v => v.dateDebut || '',
+    dateFin: v => v.dateFin || '',
+  }), []);
+
+  const { items: sorted, requestSort, sortConfig } = useSortableData(filtered, selectors);
+
   return (
     <div className="table-card">
       <TableHeader 
@@ -598,14 +781,20 @@ export const VacancesTable: React.FC<VacancesTableProps> = ({
         <table className="custom-table">
           <thead>
             <tr>
-              <th>Nom</th>
-              <th>Date de début</th>
-              <th>Date de fin</th>
+              <th className="sortable" onClick={() => requestSort('nom')}>
+                <div className="th-content">Nom <SortHeaderIcon sortConfig={sortConfig} columnKey="nom" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('dateDebut')}>
+                <div className="th-content">Date de début <SortHeaderIcon sortConfig={sortConfig} columnKey="dateDebut" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('dateFin')}>
+                <div className="th-content">Date de fin <SortHeaderIcon sortConfig={sortConfig} columnKey="dateFin" /></div>
+              </th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map(v => (
+            {sorted.map(v => (
               <tr key={v.id}>
                 <td style={{ fontWeight: 600 }}>{v.nom}</td>
                 <td>📅 {new Date(v.dateDebut).toLocaleDateString('fr-FR')}</td>

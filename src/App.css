@@ -321,6 +321,38 @@ body {
   border-bottom: 1px solid var(--border-color);
 }
 
+.custom-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: var(--transition);
+}
+
+.custom-table th.sortable:hover {
+  background-color: var(--bg-active);
+  color: white;
+}
+
+.th-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sort-icon {
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  transition: var(--transition);
+}
+
+.custom-table th.sortable:hover .sort-icon {
+  color: var(--text-secondary);
+}
+
+.sort-icon.active {
+  color: var(--primary-hover) !important;
+}
+
 .custom-table td {
   padding: 1rem;
   border-bottom: 1px solid var(--border-color);
