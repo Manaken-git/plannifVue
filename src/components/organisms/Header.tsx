@@ -33,6 +33,7 @@ export const Header: React.FC<HeaderProps> = ({
       case 'creneaux': return 'Gestion des Créneaux Horaires';
       case 'configs': return 'Configurations Matières/Classes';
       case 'vacances': return 'Gestion des Vacances';
+      case 'plannings': return 'Plannings Sauvegardés';
       default: return '';
     }
   };
@@ -48,6 +49,7 @@ export const Header: React.FC<HeaderProps> = ({
       case 'creneaux': return 'Plages et créneaux horaires de cours';
       case 'configs': return 'Configurations de volume horaire par classe et matière';
       case 'vacances': return 'Calendrier des vacances scolaires et jours fériés';
+      case 'plannings': return 'Consultez et visualisez les plannings générés';
       default: return '';
     }
   };
@@ -117,13 +119,15 @@ export const Header: React.FC<HeaderProps> = ({
         <Button variant="secondary" onClick={onRefresh} disabled={loading}>
           Actualiser
         </Button>
-        <Button 
-          variant="primary" 
-          onClick={onCreateClick}
-          icon={<Plus size={16} />}
-        >
-          {getCreateLabel()}
-        </Button>
+        {getCreateLabel() && (
+          <Button 
+            variant="primary" 
+            onClick={onCreateClick}
+            icon={<Plus size={16} />}
+          >
+            {getCreateLabel()}
+          </Button>
+        )}
       </div>
     </header>
   );

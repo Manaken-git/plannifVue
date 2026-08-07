@@ -90,6 +90,29 @@ export interface MatiereClasseConfig {
   volumeHorairePeriode?: number | null;
 }
 
+export interface PlanningDTO {
+  id?: number;
+  nom: string;
+  dateCreation: string;
+  seances: Seance[];
+}
+
+export interface PlanningSaveDTO {
+  id?: number;
+  nom: string;
+  dateCreation?: string;
+  seances: {
+    id?: number;
+    professeurId?: number;
+    classeId?: number;
+    matiereId?: number;
+    salleId?: number;
+    creneauId?: number;
+    type?: string;
+  }[];
+}
+
+
 
 const handleResponse = async (response: Response) => {
   if (!response.ok) {
@@ -380,5 +403,21 @@ export const api = {
       }).then(handleResponse),
     delete: (id: number): Promise<void> => 
       fetch(`/vacances/delete/${id}`, { method: 'DELETE' }).then(handleResponse)
+  },
+
+  // PLANNINGS
+  plannings: {
+    list: (): Promise<PlanningDTO[]> => 
+      fetch('/plannings/list').then(handleResponse),
+    get: (id: number): Promise<PlanningDTO> => 
+      fetch(`/plannings/${id}`).then(handleResponse),
+    save: (data: PlanningSaveDTO): Promise<PlanningDTO> => 
+      fetch('/plannings/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }).then(handleResponse),
+    delete: (id: number): Promise<void> => 
+      fetch(`/plannings/delete/${id}`, { method: 'DELETE' }).then(handleResponse)
   }
 };

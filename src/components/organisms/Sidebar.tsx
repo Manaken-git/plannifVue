@@ -8,10 +8,11 @@ import {
   GraduationCap,
   Clock,
   Sliders,
-  Sun
+  Sun,
+  ClipboardList
 } from 'lucide-react';
 
-export type Tab = 'dashboard' | 'professeurs' | 'classes' | 'eleves' | 'matieres' | 'salles' | 'creneaux' | 'configs' | 'vacances';
+export type Tab = 'dashboard' | 'professeurs' | 'classes' | 'eleves' | 'matieres' | 'salles' | 'creneaux' | 'configs' | 'vacances' | 'plannings';
 
 interface SidebarProps {
   activeTab: Tab;
@@ -29,6 +30,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
     { id: 'creneaux' as Tab, label: 'Créneaux', icon: <Clock size={18} /> },
     { id: 'configs' as Tab, label: 'Config. Matières', icon: <Sliders size={18} /> },
     { id: 'vacances' as Tab, label: 'Vacances Scolaires', icon: <Sun size={18} /> },
+    { id: 'plannings' as Tab, label: 'Plannings Enregistrés', icon: <ClipboardList size={18} /> },
   ];
 
   return (

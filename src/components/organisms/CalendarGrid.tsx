@@ -1,7 +1,7 @@
 import React from 'react';
 import { SlidersHorizontal } from 'lucide-react';
 import { SessionCard } from '../molecules/SessionCard';
-import type { Seance, Professeur, Classe, Matiere, Salle } from '../../services/api';
+import type { Seance, Professeur, Classe, Matiere, Salle, PlanningDTO } from '../../services/api';
 
 interface CalendarGridProps {
   seances: Seance[];
@@ -15,6 +15,9 @@ interface CalendarGridProps {
   };
   onFilterChange: (filter: { type: 'all' | 'professeur' | 'classe' | 'matiere' | 'salle'; value: string }) => void;
   onEditSession: (seance: Seance) => void;
+  plannings?: PlanningDTO[];
+  selectedPlanningId?: number | null;
+  onPlanningChange?: (id: number | null) => void;
 }
 
 export const CalendarGrid: React.FC<CalendarGridProps> = ({
@@ -25,7 +28,10 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   salles,
   calendarFilter,
   onFilterChange,
-  onEditSession
+  onEditSession,
+  plannings = [],
+  selectedPlanningId = null,
+  onPlanningChange
 }) => {
   const daysOfWeek = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
   const hoursOfDay = Array.from({ length: 9 }, (_, i) => 8 + i); // 8 to 16
@@ -58,8 +64,20 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
     <div className="table-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       <div className="calendar-controls">
         <div className="calendar-filters">
-          <SlidersHorizontal size={16} style={{ color: 'var(--text-secondary)' }} />
-          <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>Filtrer le planning :</span>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>Source :</span>
+          <select 
+            className="calendar-select"
+            value={selectedPlanningId || ''}
+            onChange={(e) => onPlanningChange && onPlanningChange(e.target.value ? Number(e.target.value) : null)}
+          >
+            <option value="">Séances globales (hors planning)</option>
+            {plannings.map(p => (
+              <option key={p.id} value={p.id}>{p.nom}</option>
+            ))}
+          </select>
+
+          <SlidersHorizontal size={16} style={{ color: 'var(--text-secondary)', marginLeft: '1rem' }} />
+          <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>Filtrer :</span>
           
           <select 
             className="calendar-select"

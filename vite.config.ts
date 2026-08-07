@@ -16,6 +16,7 @@ export default defineConfig({
       '/creneaux': 'http://localhost:8081/planning-data',
       '/config': 'http://localhost:8081/planning-data',
       '/vacances': 'http://localhost:8081/planning-data',
+      '/plannings': 'http://localhost:8081/planning-data',
     }
   }
 })

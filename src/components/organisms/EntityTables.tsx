@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { 
   Search, Edit2, Trash2, GraduationCap, Users, UserCheck, BookOpen, Home, Clock, Sliders, Calendar,
-  ArrowUpDown, ArrowUp, ArrowDown 
+  ArrowUpDown, ArrowUp, ArrowDown, Eye
 } from 'lucide-react';
 import { Badge } from '../atoms/Badge';
 import { Button } from '../atoms/Button';
-import type { Professeur, Eleve, Classe, Matiere, Salle, Creneau, MatiereClasseConfig, Vacances } from '../../services/api';
+import type { Professeur, Eleve, Classe, Matiere, Salle, Creneau, MatiereClasseConfig, Vacances, PlanningDTO } from '../../services/api';
 
 interface SortConfig {
   key: string;
@@ -811,5 +811,94 @@ export const VacancesTable: React.FC<VacancesTableProps> = ({
     </div>
   );
 };
+
+
+// 9. PLANNINGS TABLE
+interface PlanningsTableProps {
+  plannings: PlanningDTO[];
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+  onVisualize: (planning: PlanningDTO) => void;
+  onDelete: (id: number) => void;
+}
+
+export const PlanningsTable: React.FC<PlanningsTableProps> = ({
+  plannings,
+  searchTerm,
+  onSearchChange,
+  onVisualize,
+  onDelete,
+}) => {
+  const filtered = plannings.filter(p => 
+    p.nom.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const selectors = useMemo<Record<string, (p: PlanningDTO) => any>>(() => ({
+    nom: p => p.nom || '',
+    dateCreation: p => p.dateCreation || '',
+    nbSeances: p => (p.seances || []).length,
+  }), []);
+
+  const { items: sorted, requestSort, sortConfig } = useSortableData(filtered, selectors);
+
+  return (
+    <div className="table-card">
+      <TableHeader 
+        title={`Plannings enregistrés (${plannings.length})`}
+        searchTerm={searchTerm}
+        onSearchChange={onSearchChange}
+        placeholder="Rechercher par nom..."
+      />
+
+      {filtered.length === 0 ? (
+        <div className="empty-state">
+          <Calendar className="empty-state-icon" />
+          <h3>Aucun planning trouvé</h3>
+          <p>Les plannings générés s'afficheront ici.</p>
+        </div>
+      ) : (
+        <table className="custom-table">
+          <thead>
+            <tr>
+              <th className="sortable" onClick={() => requestSort('nom')}>
+                <div className="th-content">Nom <SortHeaderIcon sortConfig={sortConfig} columnKey="nom" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('dateCreation')}>
+                <div className="th-content">Date de création <SortHeaderIcon sortConfig={sortConfig} columnKey="dateCreation" /></div>
+              </th>
+              <th className="sortable" onClick={() => requestSort('nbSeances')}>
+                <div className="th-content">Nombre de séances <SortHeaderIcon sortConfig={sortConfig} columnKey="nbSeances" /></div>
+              </th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.map(p => (
+              <tr key={p.id}>
+                <td style={{ fontWeight: 600 }}>{p.nom}</td>
+                <td>📅 {new Date(p.dateCreation).toLocaleString('fr-FR')}</td>
+                <td>
+                  <Badge variant="primary">{(p.seances || []).length} séances</Badge>
+                </td>
+                <td className="actions-cell">
+                  <Button 
+                    variant="primary" 
+                    onClick={() => onVisualize(p)}
+                    icon={<Eye size={16} />}
+                    style={{ marginRight: '0.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.25rem', padding: '0.25rem 0.5rem', fontSize: '0.8rem' }}
+                  >
+                    Visualiser
+                  </Button>
+                  <Button variant="icon-delete" onClick={() => p.id && onDelete(p.id)} icon={<Trash2 size={16} />} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+};
+
 
 

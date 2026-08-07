@@ -15,7 +15,8 @@ import type {
   Seance,
   Creneau,
   MatiereClasseConfig,
-  Vacances
+  Vacances,
+  PlanningDTO
 } from './services/api';
 
 // Components
@@ -33,7 +34,8 @@ import {
   SallesTable,
   CreneauxTable,
   MatiereClasseConfigsTable,
-  VacancesTable
+  VacancesTable,
+  PlanningsTable
 } from './components/organisms/EntityTables';
 
 import './App.css';
@@ -52,6 +54,8 @@ export default function App() {
   const [creneaux, setCreneaux] = useState<Creneau[]>([]);
   const [matiereClasseConfigs, setMatiereClasseConfigs] = useState<MatiereClasseConfig[]>([]);
   const [vacances, setVacances] = useState<Vacances[]>([]);
+  const [plannings, setPlannings] = useState<PlanningDTO[]>([]);
+  const [selectedPlanningId, setSelectedPlanningId] = useState<number | null>(null);
   
   // Loading & Error States
   const [loading, setLoading] = useState(false);
@@ -78,7 +82,7 @@ export default function App() {
   const loadAllData = async () => {
     setLoading(true);
     try {
-      const [profsData, elevesData, classesData, matieresData, sallesData, seancesData, creneauxData, configsData, vacancesData] = await Promise.all([
+      const [profsData, elevesData, classesData, matieresData, sallesData, seancesData, creneauxData, configsData, vacancesData, planningsData] = await Promise.all([
         api.professeurs.list().catch(() => []),
         api.eleves.listAll().catch(() => []),
         api.classes.list().catch(() => []),
@@ -87,7 +91,8 @@ export default function App() {
         api.seances.list().catch(() => []),
         api.creneaux.list().catch(() => []),
         api.configs.list().catch(() => []),
-        api.vacances.list().catch(() => [])
+        api.vacances.list().catch(() => []),
+        api.plannings.list().catch(() => [])
       ]);
 
       setProfesseurs(profsData);
@@ -99,6 +104,7 @@ export default function App() {
       setCreneaux(creneauxData);
       setMatiereClasseConfigs(configsData);
       setVacances(vacancesData);
+      setPlannings(planningsData);
     } catch (err: any) {
       showToast("Erreur lors de la récupération des données", 'error');
     } finally {
@@ -243,6 +249,12 @@ export default function App() {
       else if (entity === 'configs') await api.configs.delete(id);
       else if (entity === 'vacances') await api.vacances.delete(id);
       else if (entity === 'dashboard') await api.seances.delete(id);
+      else if (entity === 'plannings') {
+        await api.plannings.delete(id);
+        if (selectedPlanningId === id) {
+          setSelectedPlanningId(null);
+        }
+      }
 
       showToast("Élément supprimé avec succès !");
       setModalType(null);
@@ -314,7 +326,10 @@ export default function App() {
 
   // Calendar Sessions filter calculation
   const filteredSeances = useMemo(() => {
-    return seances.filter(s => {
+    const selectedPlanning = plannings.find(p => p.id === selectedPlanningId);
+    const sourceSeances = selectedPlanning ? (selectedPlanning.seances || []) : seances;
+
+    return sourceSeances.filter(s => {
       if (calendarFilter.type === 'all') return true;
       if (calendarFilter.type === 'professeur') return s.professeurNomComplet === calendarFilter.value;
       if (calendarFilter.type === 'classe') return s.classeNom === calendarFilter.value;
@@ -322,7 +337,7 @@ export default function App() {
       if (calendarFilter.type === 'salle') return s.salleCode === calendarFilter.value;
       return true;
     });
-  }, [seances, calendarFilter]);
+  }, [seances, plannings, selectedPlanningId, calendarFilter]);
 
   return (
     <div className="app-container">
@@ -336,14 +351,14 @@ export default function App() {
           loading={loading} 
           onRefresh={loadAllData} 
           onCreateClick={() => openCreateModal(activeTab)} 
-          onImportSelect={activeTab !== 'vacances' ? handleImport : undefined}
-          onExportClick={activeTab !== 'vacances' ? handleExport : undefined}
+          onImportSelect={(activeTab !== 'vacances' && activeTab !== 'plannings') ? handleImport : undefined}
+          onExportClick={(activeTab !== 'vacances' && activeTab !== 'plannings') ? handleExport : undefined}
         />
 
         {/* Dashboard Stats */}
         {activeTab === 'dashboard' && (
           <div className="dashboard-grid">
-            <StatCard icon={<CalendarIcon size={24} />} iconColor="primary" value={seances.length} label="Séances planifiées" />
+            <StatCard icon={<CalendarIcon size={24} />} iconColor="primary" value={filteredSeances.length} label="Séances planifiées" />
             <StatCard icon={<GraduationCap size={24} />} iconColor="success" value={professeurs.length} label="Enseignants" />
             <StatCard icon={<Users size={24} />} iconColor="info" value={eleves.length} label="Élèves inscrits" />
             <StatCard icon={<Home size={24} />} iconColor="warning" value={salles.length} label="Salles configurées" />
@@ -361,6 +376,9 @@ export default function App() {
             calendarFilter={calendarFilter}
             onFilterChange={setCalendarFilter}
             onEditSession={(seance) => openEditModal('dashboard', seance)}
+            plannings={plannings}
+            selectedPlanningId={selectedPlanningId}
+            onPlanningChange={setSelectedPlanningId}
           />
         )}
 
@@ -441,6 +459,19 @@ export default function App() {
             onSearchChange={setSearchTerm} 
             onEdit={(v) => openEditModal('vacances', v)} 
             onDelete={(id) => handleDelete('vacances', id)} 
+          />
+        )}
+
+        {activeTab === 'plannings' && (
+          <PlanningsTable 
+            plannings={plannings} 
+            searchTerm={searchTerm} 
+            onSearchChange={setSearchTerm} 
+            onVisualize={(p) => {
+              setSelectedPlanningId(p.id || null);
+              setActiveTab('dashboard');
+            }} 
+            onDelete={(id) => handleDelete('plannings', id)} 
           />
         )}
       </main>
