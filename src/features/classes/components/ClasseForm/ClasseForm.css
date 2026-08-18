@@ -1,0 +1,4 @@
+.classe-form__periods { display: grid; gap: 10px; }
+.classe-form__period-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.classe-form__period-header .form-section__title { margin-bottom: 2px; }
+.classe-form__empty { padding: 18px; border: 1px dashed var(--border-default); border-radius: 9px; color: var(--text-muted); background: rgba(255,255,255,.012); font-size: 11px; text-align: center; }

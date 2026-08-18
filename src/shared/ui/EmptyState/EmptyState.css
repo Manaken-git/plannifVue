@@ -1,0 +1,24 @@
+.empty-state {
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  text-align: center;
+}
+.empty-state--compact { min-height: 220px; }
+.empty-state__icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 11px;
+  border: 1px solid rgba(99,102,241,.16);
+  border-radius: 12px;
+  color: #898bff;
+  background: var(--primary-softer);
+}
+.empty-state h3 { margin: 0; font-size: 13px; font-weight: 650; }
+.empty-state p { max-width: 380px; margin: 5px 0 0; color: var(--text-muted); font-size: 11px; line-height: 1.5; }
+.empty-state__action { margin-top: 13px; }

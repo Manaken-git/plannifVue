@@ -1,0 +1,4 @@
+.professeurs-table { min-width: 1080px; }
+.professeurs-table__identity { display: flex; align-items: center; gap: 9px; }
+.professeurs-table__avatar { width: 28px; height: 28px; display: grid; place-items: center; flex: 0 0 auto; border: 1px solid rgba(99,102,241,.15); border-radius: 8px; color: #b8baff; background: var(--primary-softer); font-size: 9px; font-weight: 700; text-transform: uppercase; }
+.professeurs-table__constraints { color: var(--text-faint); font-size: 9px; white-space: nowrap; }
