@@ -1,23 +1,35 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig, loadEnv, type ProxyOptions } from 'vite';
+import react from '@vitejs/plugin-react';
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    port: 3000,
-    proxy: {
-      '/profs': 'http://localhost:8081/planning-data',
-      '/seances': 'http://localhost:8081/planning-data',
-      '/classes': 'http://localhost:8081/planning-data',
-      '/eleves': 'http://localhost:8081/planning-data',
-      '/matieres': 'http://localhost:8081/planning-data',
-      '/salles': 'http://localhost:8081/planning-data',
-      '/creneaux': 'http://localhost:8081/planning-data',
-      '/config': 'http://localhost:8081/planning-data',
-      '/vacances': 'http://localhost:8081/planning-data',
-      '/plannings': 'http://localhost:8081/planning-data',
-    }
-  }
-})
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+  const backendOrigin = env.VITE_API_PROXY_TARGET || 'http://localhost:8081';
+  const backendContext = (env.VITE_API_PROXY_CONTEXT || '/planning-data').replace(/\/$/, '');
 
+  const proxyFor = (): ProxyOptions => ({
+    target: backendOrigin,
+    changeOrigin: true,
+    secure: false,
+    rewrite: (path) => `${backendContext}${path}`,
+  });
+
+  return {
+    plugins: [react()],
+    server: {
+      port: 3000,
+      strictPort: true,
+      proxy: {
+        '/profs': proxyFor(),
+        '/seances': proxyFor(),
+        '/classes': proxyFor(),
+        '/eleves': proxyFor(),
+        '/matieres': proxyFor(),
+        '/salles': proxyFor(),
+        '/creneaux': proxyFor(),
+        '/configs': proxyFor(),
+        '/vacances': proxyFor(),
+        '/plannings': proxyFor(),
+      },
+    },
+  };
+});

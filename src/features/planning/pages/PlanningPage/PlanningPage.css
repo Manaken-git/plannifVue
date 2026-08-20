@@ -1,0 +1,12 @@
+.planning-page {
+  min-height: calc(100vh - 56px);
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 14px;
+}
+
+.planning-page > .calendar-panel {
+  flex: 1;
+}

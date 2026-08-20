@@ -1,0 +1,62 @@
+.data-card {
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(16,24,39,.96), rgba(13,21,35,.96));
+}
+.data-card__header {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.data-card__header h2 { margin: 0; font-size: 13px; font-weight: 650; }
+.data-card__header span { display: block; margin-top: 3px; color: var(--text-faint); font-size: 9px; }
+.data-card__body { min-width: 0; }
+.table-scroll { width: 100%; overflow-x: auto; }
+.entity-table { width: 100%; border-collapse: collapse; table-layout: auto; }
+.entity-table th,
+.entity-table td { padding: 11px 13px; text-align: left; border-bottom: 1px solid rgba(148,163,184,.07); vertical-align: middle; }
+.entity-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  color: #66758b;
+  background: rgba(10,17,29,.55);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+}
+.entity-table td { color: #b8c1cf; font-size: 11px; }
+.entity-table tbody tr:last-child td { border-bottom: 0; }
+.entity-table tbody tr { transition: background var(--transition); }
+.entity-table tbody tr:hover { background: rgba(255,255,255,.018); }
+.entity-table__primary { color: #edf2f8; font-weight: 600; }
+.entity-table__muted { color: var(--text-muted); }
+.entity-table__stack { display: grid; gap: 4px; }
+.entity-table__chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.entity-table__actions { display: flex; justify-content: flex-end; gap: 3px; }
+.entity-table__action-edit:hover { color: #c4b5fd !important; background: rgba(139,92,246,.08) !important; }
+.entity-table__action-delete:hover { color: #fda4af !important; background: var(--danger-soft) !important; }
+.sort-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  font: inherit;
+}
+.sort-button:hover, .sort-button.is-active { color: #a9afff; }
+@media (max-width: 720px) {
+  .data-card__header { align-items: stretch; flex-direction: column; }
+  .search-field { width: 100%; max-width: none; }
+}

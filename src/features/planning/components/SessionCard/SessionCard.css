@@ -1,0 +1,107 @@
+.session-card {
+  position: absolute;
+  z-index: 5;
+
+  left: 5px;
+  right: 5px;
+
+  min-height: 34px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  gap: 2px;
+  padding: 6px 7px 6px 8px;
+  overflow: hidden;
+
+  border: 1px solid rgba(143, 146, 255, 0.18);
+  border-left: 3px solid #8184ff;
+  border-radius: 8px;
+
+  color: #e7ebf2;
+
+  background:
+    linear-gradient(
+      100deg,
+      rgba(116, 119, 245, 0.18),
+      rgba(25, 37, 60, 0.46)
+    );
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  cursor: pointer;
+  text-align: left;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035),
+    0 5px 16px rgba(0, 0, 0, 0.11);
+
+  transition:
+    transform var(--transition),
+    border-color var(--transition),
+    background var(--transition),
+    box-shadow var(--transition);
+}
+
+.session-card:hover {
+  z-index: 10;
+  transform: translateY(-1px);
+
+  border-color: rgba(143, 146, 255, 0.34);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 0 3px rgba(116, 119, 245, 0.035),
+    0 10px 26px rgba(0, 0, 0, 0.22);
+}
+
+.session-card strong {
+  max-width: 100%;
+  overflow: hidden;
+
+  color: #edf1f7;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.session-card__time {
+  color: #b1bac9;
+  font-size: 8.5px;
+  font-weight: 650;
+}
+
+.session-card__meta {
+  max-width: 100%;
+  overflow: hidden;
+
+  color: #8c98aa;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  font-size: 8.5px;
+}
+
+.session-card--1 {
+  border-left-color: #45c5f5;
+  background: linear-gradient(100deg, rgba(69, 197, 245, 0.14), rgba(24, 42, 59, 0.42));
+}
+
+.session-card--2 {
+  border-left-color: #45d5a3;
+  background: linear-gradient(100deg, rgba(69, 213, 163, 0.13), rgba(23, 46, 47, 0.40));
+}
+
+.session-card--3 {
+  border-left-color: #f6c760;
+  background: linear-gradient(100deg, rgba(246, 199, 96, 0.12), rgba(50, 45, 29, 0.38));
+}
+
+.session-card--4 {
+  border-left-color: #b584f5;
+  background: linear-gradient(100deg, rgba(181, 132, 245, 0.14), rgba(45, 34, 57, 0.40));
+}
