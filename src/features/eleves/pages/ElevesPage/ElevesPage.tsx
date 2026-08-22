@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useToast } from '../../../../app/providers/ToastProvider';
+import { useToast } from '../../../../app/providers/useToast';
 import { PageHeader } from '../../../../shared/ui/PageHeader/PageHeader';
 import { classesApi } from '../../../classes/api/classes.api';
 import type { Classe } from '../../../classes/types/classe.types';

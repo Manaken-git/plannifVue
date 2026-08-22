@@ -1,17 +1,20 @@
-.planning-stats {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-}
+.planning-stats-dashboard{display:grid;grid-template-columns:repeat(4,minmax(210px,1fr));gap:14px}.planning-kpi{--tone:#a855f7;--soft:rgba(168,85,247,.13);min-height:218px;display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(166,183,207,.13);border-radius:14px;padding:15px 17px 0;background:radial-gradient(circle at 100% 0,var(--soft),transparent 55%),linear-gradient(145deg,rgba(20,34,58,.94),rgba(9,18,33,.9));box-shadow:0 15px 36px rgba(0,0,0,.18)}.planning-kpi--alert{--tone:#ff704d;--soft:rgba(255,112,77,.13)}.planning-kpi--success{--tone:#31dc8b;--soft:rgba(49,220,139,.12)}.planning-kpi--info{--tone:#28a9ff;--soft:rgba(40,169,255,.13)}.planning-kpi header{display:flex;align-items:center;gap:11px}.planning-kpi__icon{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;border:1px solid color-mix(in srgb,var(--tone) 35%,transparent);border-radius:11px;color:var(--tone);background:var(--soft)}.planning-kpi h3{font-size:13px;color:#edf2f8}.planning-kpi p{margin-top:2px;color:#7f8da2;font-size:10px}.planning-kpi__value{display:flex;align-items:center;justify-content:space-between;margin-top:11px}.planning-kpi__value strong{color:var(--tone);font-size:27px}.planning-kpi__value span{border:1px solid color-mix(in srgb,var(--tone) 30%,transparent);border-radius:6px;padding:4px 8px;color:var(--tone);background:var(--soft);font-size:9px;font-weight:700}.planning-kpi__progress{height:6px;margin-top:8px;overflow:hidden;border-radius:99px;background:rgba(166,183,207,.14)}.planning-kpi__progress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--tone),color-mix(in srgb,var(--tone) 55%,white))}.planning-kpi__preview{display:grid;gap:5px;margin-top:8px}.planning-kpi__preview>div{display:flex;justify-content:space-between;color:#aab5c4;font-size:9px}.planning-kpi__preview em{color:#78879c;font-style:normal}.planning-kpi__preview p{padding:5px 0}.planning-kpi>button{width:calc(100% + 34px);min-height:32px;margin:auto -17px 0;border:0;border-top:1px solid rgba(166,183,207,.08);color:var(--tone);background:rgba(0,0,0,.08);font-size:9.5px;font-weight:700;cursor:pointer}.planning-kpi>button:hover{background:var(--soft)}.planning-detail-backdrop{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:20px;background:rgba(2,8,20,.75);backdrop-filter:blur(8px)}.planning-detail{width:min(680px,100%);max-height:calc(100vh - 40px);display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(143,146,255,.3);border-radius:17px;background:linear-gradient(150deg,#162743,#091426);box-shadow:0 30px 90px rgba(0,0,0,.55)}.planning-detail>header{display:flex;align-items:center;gap:12px;padding:17px 19px;border-bottom:1px solid var(--border-default)}.planning-detail>header>div{flex:1}.planning-detail h2{font-size:16px}.planning-detail header p{margin-top:2px;color:var(--text-muted);font-size:11px}.planning-detail header>button{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--border-default);border-radius:9px;color:var(--text-muted);background:rgba(255,255,255,.03);cursor:pointer}.planning-detail__count{padding:11px 19px;color:var(--text-faint);font-size:10px}.planning-detail__count strong{margin-right:5px;color:#9b9eff;font-size:23px}.planning-detail__rows{min-height:180px;overflow-y:auto;display:grid;gap:6px;padding:7px 19px 18px}.planning-detail__row{min-height:55px;display:grid;grid-template-columns:8px minmax(150px,1fr) 90px 95px 16px;align-items:center;gap:10px;border:1px solid rgba(166,183,207,.1);border-radius:10px;padding:8px 11px;background:rgba(15,29,51,.67)}.planning-detail__row>i{width:7px;height:7px;border-radius:50%;background:#31dc8b}.planning-detail__row>i.is-alert{background:#ff704d}.planning-detail__row>span{display:grid;gap:5px}.planning-detail__row strong{font-size:11px}.planning-detail__row small{height:3px;overflow:hidden;border-radius:99px;background:rgba(166,183,207,.12)}.planning-detail__row small b{display:block;height:100%;background:linear-gradient(90deg,#777af8,#28a9ff)}.planning-detail__row em{color:var(--text-muted);font-size:10px;font-style:normal;text-align:right}.planning-detail__row mark{border-radius:5px;padding:4px;color:#f0b14a;background:rgba(245,158,11,.1);font-size:9px;text-align:center}.planning-detail__empty{min-height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-faint)}.planning-detail__empty strong{margin-top:9px;color:var(--text-secondary)}.planning-detail__empty p{font-size:10px}@media(max-width:1200px){.planning-stats-dashboard{grid-template-columns:repeat(2,1fr)}}@media(max-width:620px){.planning-stats-dashboard{grid-template-columns:1fr}}
+.planning-detail__row{color:var(--text-secondary);text-align:left;cursor:pointer}.planning-detail__row:hover{border-color:rgba(143,146,255,.35);background:rgba(30,46,78,.8)}.planning-detail__footer{border-top:1px solid var(--border-default);padding:12px 19px;color:var(--text-faint);font-size:10px;background:rgba(5,13,26,.35)}
+.planning-kpi p { font-size: 12px; line-height: 1.35; }
+.planning-kpi__value span { font-size: 11px; }
+.planning-kpi__preview > div { font-size: 11px; }
+.planning-kpi > button { min-height: 36px; font-size: 11.5px; }
+.planning-detail header p { font-size: 13px; }
+.planning-detail__count { font-size: 12px; }
+.planning-detail__row strong { font-size: 13px; }
+.planning-detail__row em { font-size: 12px; }
+.planning-detail__row mark { font-size: 11px; }
+.planning-detail__empty p { font-size: 12px; }
 
-@media (max-width: 1000px) {
-  .planning-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 560px) {
-  .planning-stats {
-    grid-template-columns: 1fr;
-  }
+@media (max-width: 720px) {
+  .planning-detail-backdrop { padding: 12px; align-items: end; }
+  .planning-detail { max-height: 92vh; border-radius: 16px 16px 10px 10px; }
+  .planning-detail__row { grid-template-columns: 8px minmax(0, 1fr) auto; }
+  .planning-detail__row em, .planning-detail__row > svg { display: none; }
+  .planning-detail__row mark { max-width: 110px; }
 }
