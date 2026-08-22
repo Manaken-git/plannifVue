@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useToast } from '../../../../app/providers/ToastProvider';
+import { useToast } from '../../../../app/providers/useToast';
 import { PageHeader } from '../../../../shared/ui/PageHeader/PageHeader';
 import { classesApi } from '../../../classes/api/classes.api';
 import type { Classe } from '../../../classes/types/classe.types';
-import { elevesApi } from '../../../eleves/api/eleves.api';
 import { matieresApi } from '../../../matieres/api/matieres.api';
 import type { Matiere } from '../../../matieres/types/matiere.types';
 import { planningsApi } from '../../../plannings/api/plannings.api';
@@ -32,26 +31,25 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
   const [matieres, setMatieres] = useState<Matiere[]>([]);
   const [salles, setSalles] = useState<Salle[]>([]);
   const [plannings, setPlannings] = useState<PlanningDTO[]>([]);
-  const [studentCount, setStudentCount] = useState(0);
   const [filter, setFilter] = useState<CalendarFilter>({ type: 'all', value: '' });
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<'create' | 'edit'>('create');
   const [editing, setEditing] = useState<Seance | null>(null);
+  const [focusDate, setFocusDate] = useState<string>();
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [sessions, professors, classList, subjects, rooms, savedPlannings, students] = await Promise.all([
+      const [sessions, professors, classList, subjects, rooms, savedPlannings] = await Promise.all([
         planningApi.list(),
         professeursApi.list().catch(() => []),
         classesApi.list().catch(() => []),
         matieresApi.list().catch(() => []),
         sallesApi.list().catch(() => []),
         planningsApi.list().catch(() => []),
-        elevesApi.list().catch(() => []),
       ]);
-      setSeances(sessions); setProfesseurs(professors); setClasses(classList); setMatieres(subjects); setSalles(rooms); setPlannings(savedPlannings); setStudentCount(students.length);
+      setSeances(sessions); setProfesseurs(professors); setClasses(classList); setMatieres(subjects); setSalles(rooms); setPlannings(savedPlannings);
     } catch (error) {
       notify(error instanceof Error ? error.message : 'Impossible de charger le planning.', 'error');
     } finally {
@@ -93,12 +91,22 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
   const exportCsv = async () => { try { await planningApi.exportCsv(); } catch { notify("Échec de l'export CSV.", 'error'); } };
   const create = () => { setMode('create'); setEditing(null); setOpen(true); };
   const edit = (seance: Seance) => { setMode('edit'); setEditing(seance); setOpen(true); };
+  const focusFromStats = (type: 'professeur' | 'classe' | 'matiere', id: number) => {
+    const value = type === 'professeur' ? (() => { const item = professeurs.find((professeur) => professeur.id === id); return item ? `${item.prenom} ${item.nom}`.trim() : ''; })() : type === 'classe' ? classes.find((classe) => classe.id === id)?.nom || '' : matieres.find((matiere) => matiere.id === id)?.nom || '';
+    const session = sourceSessions.find((item) => type === 'professeur' ? item.professeurNomComplet === value || item.professeurNomComplet?.includes(value.split(' ').at(-1) || '') : type === 'classe' ? item.classeNom === value : item.matiereNom === value);
+    if (!session) { notify('Aucune séance planifiée pour cet élément.', 'error'); return; }
+    setFilter({ type, value });
+    setFocusDate(session.debut);
+    setTimeout(() => { const calendar = document.querySelector('.calendar-panel'); calendar?.scrollIntoView({ behavior:'smooth', block:'start' }); calendar?.animate([{boxShadow:'0 0 0 1px rgba(69,197,245,.8),0 0 36px rgba(69,197,245,.3)'},{boxShadow:'none'}],{duration:1400,easing:'ease-out'}); }, 80);
+    notify('Élément sélectionné et affiché dans le planning.');
+  };
 
   return (
     <div className="planning-page">
       <PageHeader title="Planning de la semaine" description="Visualisez, filtrez et organisez les séances de cours." createLabel="Nouvelle séance" loading={loading} onCreate={create} onRefresh={load} onImport={importCsv} onExport={exportCsv} />
-      <PlanningStats sessions={sourceSessions.length} professors={professeurs.length} students={studentCount} rooms={salles.length} />
-      <CalendarGrid seances={filteredSessions} professeurs={professeurs} classes={classes} matieres={matieres} salles={salles} plannings={plannings} selectedPlanningId={selectedPlanningId} onPlanningChange={onSelectedPlanningChange} filter={filter} onFilterChange={setFilter} onEdit={edit} onCreate={create} />
+      <PlanningStats sessions={sourceSessions} professors={professeurs} classes={classes} subjects={matieres} onSelect={focusFromStats} />
+      <CalendarGrid seances={filteredSessions} professeurs={professeurs} classes={classes} matieres={matieres} salles={salles} plannings={plannings} selectedPlanningId={selectedPlanningId} onPlanningChange={onSelectedPlanningChange} filter={filter} onFilterChange={setFilter} onEdit={edit} onCreate={create} focusDate={focusDate} />
+      <footer className="planning-page__footer"><div><button type="button" onClick={() => setFilter({ type:'professeur', value:'' })}>Professeurs ({professeurs.length})</button><button type="button" onClick={() => setFilter({ type:'classe', value:'' })}>Classes ({classes.length})</button><button type="button" onClick={() => setFilter({ type:'matiere', value:'' })}>Matières ({matieres.length})</button></div><span>Les séances sont affichées en heure locale de l’établissement.</span></footer>
       <SessionForm open={open} mode={mode} item={editing} professeurs={professeurs} classes={classes} matieres={matieres} salles={salles} loading={loading} onClose={() => setOpen(false)} onSave={save} onDelete={remove} />
     </div>
   );

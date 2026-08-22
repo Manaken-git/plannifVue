@@ -10,3 +10,12 @@
 .planning-page > .calendar-panel {
   flex: 1;
 }
+
+.planning-page__footer{position:sticky;bottom:0;z-index:25;min-height:44px;display:flex;align-items:center;gap:24px;border:1px solid rgba(166,183,207,.11);border-radius:10px;padding:7px 11px;background:rgba(9,20,37,.94);box-shadow:0 -10px 28px rgba(0,0,0,.18);backdrop-filter:blur(14px)}.planning-page__footer>div{display:flex;gap:7px}.planning-page__footer button{min-height:27px;border:1px solid rgba(116,119,245,.28);border-radius:7px;padding:0 9px;color:#b9baff;background:rgba(116,119,245,.08);font-size:9.5px;cursor:pointer}.planning-page__footer span{color:var(--text-faint);font-size:10px}
+
+@media (max-width: 760px) {
+  .planning-page { height: auto; min-height: calc(100vh - 96px); overflow: visible; }
+  .planning-page__footer { position: relative; margin-top: auto; flex-wrap: wrap; gap: 9px; }
+  .planning-page__footer > div { flex-wrap: wrap; }
+  .planning-page__footer button, .planning-page__footer span { font-size: 12px; }
+}

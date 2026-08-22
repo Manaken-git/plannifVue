@@ -122,3 +122,28 @@ a {
 .spin {
   animation: spin 0.8s linear infinite;
 }
+
+/* Shared readability and responsive behavior for every entity tab. */
+input, select, textarea { font-size: 13px; }
+select { min-width: 0; text-overflow: ellipsis; }
+
+@media (max-width: 900px) {
+  body { font-size: 14px; }
+}
+
+@media (max-width: 620px) {
+  body { font-size: 15px; }
+  input, select, textarea { font-size: 16px; }
+  .data-card { border-radius: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #898bff;
+  outline-offset: 2px;
+}

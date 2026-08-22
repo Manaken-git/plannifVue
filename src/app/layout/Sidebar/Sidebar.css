@@ -42,6 +42,7 @@
   gap: 10px;
   padding: 4px 8px 18px;
 }
+.sidebar__collapse{width:32px;height:32px;display:grid;place-items:center;margin-left:auto;border:1px solid rgba(166,183,207,.1);border-radius:8px;color:#8e9cb1;background:rgba(255,255,255,.025);cursor:pointer}.sidebar__collapse:hover{color:white;border-color:rgba(143,146,255,.3)}.sidebar.is-collapsed{padding-inline:9px}.sidebar.is-collapsed .sidebar__brand{justify-content:center;padding-inline:0}.sidebar.is-collapsed .sidebar__brand-mark,.sidebar.is-collapsed .sidebar__brand-copy,.sidebar.is-collapsed .sidebar__group-label,.sidebar.is-collapsed .sidebar__item-label{display:none}.sidebar.is-collapsed .sidebar__collapse{margin:0}.sidebar.is-collapsed .sidebar__item{justify-content:center;padding:0}
 
 .sidebar__brand-mark {
   width: 35px;
@@ -284,3 +285,5 @@
     height: 2px;
   }
 }
+.sidebar__group-label { font-size: 10.5px; }
+.sidebar__item { font-size: 13px; }

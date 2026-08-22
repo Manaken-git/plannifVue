@@ -9,6 +9,8 @@ import {
   SunMedium,
   UserRoundCheck,
   UsersRound,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 import type { AppTab } from '../../navigation/navigation.types';
 import './Sidebar.css';
@@ -16,6 +18,8 @@ import './Sidebar.css';
 interface SidebarProps {
   activeTab: AppTab;
   onTabChange: (tab: AppTab) => void;
+  collapsed: boolean;
+  onCollapsedChange: (collapsed: boolean) => void;
 }
 
 const groups: Array<{
@@ -49,15 +53,16 @@ const groups: Array<{
   },
 ];
 
-export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
+export function Sidebar({ activeTab, onTabChange, collapsed, onCollapsedChange }: SidebarProps) {
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar${collapsed ? ' is-collapsed' : ''}`}>
       <div className="sidebar__brand">
         <div className="sidebar__brand-mark" aria-hidden="true">P</div>
         <div className="sidebar__brand-copy">
           <strong>Plannif'Edu</strong>
           <span>Gestion scolaire</span>
         </div>
+        <button className="sidebar__collapse" type="button" onClick={() => onCollapsedChange(!collapsed)} aria-label={collapsed ? 'Ouvrir la navigation' : 'Réduire la navigation'}>{collapsed ? <PanelLeftOpen size={17}/> : <PanelLeftClose size={17}/>}</button>
       </div>
 
       <nav className="sidebar__nav" aria-label="Navigation principale">

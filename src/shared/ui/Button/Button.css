@@ -7,7 +7,7 @@
   padding: 0 12px;
   border: 1px solid transparent;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
@@ -30,8 +30,8 @@
 .button--secondary:not(:disabled):hover { color: white; border-color: var(--border-strong); background: #151f31; }
 .button--ghost { color: var(--text-secondary); background: transparent; }
 .button--ghost:not(:disabled):hover { color: white; background: rgba(255,255,255,.04); }
-.button--danger { color: #fecdd3; border-color: rgba(251,113,133,.18); background: var(--danger-soft); }
-.button--danger:not(:disabled):hover { background: rgba(251,113,133,.16); }
+.button--danger { color: #ffd7df; border-color: rgba(251,113,133,.32); background: rgba(190,45,70,.22); }
+.button--danger:not(:disabled):hover { color: white; border-color: rgba(251,113,133,.5); background: rgba(220,55,83,.72); }
 .button--icon { width: 32px; min-height: 32px; padding: 0; color: var(--text-muted); border-color: transparent; background: transparent; }
 .button--icon:not(:disabled):hover { color: white; background: rgba(255,255,255,.05); }
 .button__icon { display: inline-flex; align-items: center; justify-content: center; }

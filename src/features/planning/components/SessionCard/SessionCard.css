@@ -2,41 +2,47 @@
   position: absolute;
   z-index: 5;
 
-  left: 5px;
-  right: 5px;
+  left: 6px;
+  right: 6px;
 
-  min-height: 34px;
+  min-height: 44px;
 
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 
-  gap: 2px;
-  padding: 6px 7px 6px 8px;
+  gap: 3px;
+
+  padding: 10px 12px;
+
   overflow: hidden;
 
-  border: 1px solid rgba(143, 146, 255, 0.18);
-  border-left: 3px solid #8184ff;
-  border-radius: 8px;
+  border:
+    1px solid rgba(143, 146, 255, 0.18);
 
-  color: #e7ebf2;
+  border-left:
+    3px solid #8184ff;
+
+  border-radius: 11px;
+
+  color: #e8edf5;
 
   background:
     linear-gradient(
-      100deg,
-      rgba(116, 119, 245, 0.18),
-      rgba(25, 37, 60, 0.46)
+      110deg,
+      rgba(116, 119, 245, 0.19),
+      rgba(30, 43, 68, 0.48)
     );
 
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 
   cursor: pointer;
   text-align: left;
 
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.035),
-    0 5px 16px rgba(0, 0, 0, 0.11);
+    inset 0 1px 0 rgba(255, 255, 255, 0.055),
+    0 5px 18px rgba(0, 0, 0, 0.13);
 
   transition:
     transform var(--transition),
@@ -45,63 +51,300 @@
     box-shadow var(--transition);
 }
 
-.session-card:hover {
-  z-index: 10;
-  transform: translateY(-1px);
 
-  border-color: rgba(143, 146, 255, 0.34);
+/* -------------------------------------------------------------------------- */
+/* Petit reflet supérieur                                                     */
+/* -------------------------------------------------------------------------- */
+
+.session-card::before {
+  content: '';
+
+  position: absolute;
+
+  top: 0;
+  left: 3px;
+  right: 0;
+
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.10),
+      rgba(255, 255, 255, 0.025),
+      transparent 80%
+    );
+
+  pointer-events: none;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* Hover                                                                      */
+/* -------------------------------------------------------------------------- */
+
+.session-card:hover {
+  z-index: 20;
+
+  transform:
+    translateY(-2px)
+    scale(1.008);
+
+  border-color:
+    rgba(143, 146, 255, 0.34);
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(116, 119, 245, 0.24),
+      rgba(32, 47, 74, 0.56)
+    );
 
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 0 0 3px rgba(116, 119, 245, 0.035),
-    0 10px 26px rgba(0, 0, 0, 0.22);
+    inset 0 1px 0 rgba(255, 255, 255, 0.075),
+    0 0 0 3px rgba(116, 119, 245, 0.04),
+    0 12px 30px rgba(0, 0, 0, 0.24),
+    0 6px 24px rgba(80, 83, 205, 0.08);
 }
 
-.session-card strong {
-  max-width: 100%;
-  overflow: hidden;
 
-  color: #edf1f7;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.session-card:focus-visible {
+  z-index: 20;
 
-  font-size: 11px;
-  font-weight: 650;
+  outline: none;
+
+  border-color:
+    rgba(143, 146, 255, 0.52);
+
+  box-shadow:
+    0 0 0 3px rgba(116, 119, 245, 0.12),
+    0 12px 30px rgba(0, 0, 0, 0.22);
 }
+
+
+.session-card:active {
+  transform:
+    translateY(0)
+    scale(0.995);
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* Heure                                                                      */
+/* -------------------------------------------------------------------------- */
 
 .session-card__time {
-  color: #b1bac9;
-  font-size: 8.5px;
-  font-weight: 650;
+  position: relative;
+
+  z-index: 1;
+
+  flex-shrink: 0;
+
+  color: #bdc7d5;
+
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.1;
+
+  letter-spacing: 0.01em;
 }
 
-.session-card__meta {
+
+/* -------------------------------------------------------------------------- */
+/* Matière                                                                    */
+/* -------------------------------------------------------------------------- */
+
+.session-card strong {
+  position: relative;
+
+  z-index: 1;
+
   max-width: 100%;
+
   overflow: hidden;
 
-  color: #8c98aa;
+  color: #f4f7fb;
+
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.2;
+
   text-overflow: ellipsis;
   white-space: nowrap;
-
-  font-size: 8.5px;
 }
+
+.session-card__subject{position:relative;z-index:1;max-width:100%;display:flex;align-items:center;gap:6px}.session-card__subject i{width:23px;height:23px;flex:0 0 23px;display:grid;place-items:center;border-radius:6px;color:#c8c9ff;background:rgba(116,119,245,.15)}
+
+
+/* -------------------------------------------------------------------------- */
+/* Informations secondaires                                                   */
+/* -------------------------------------------------------------------------- */
+
+.session-card__meta {
+  position: relative;
+
+  z-index: 1;
+
+  max-width: 100%;
+
+  overflow: hidden;
+
+  margin-top: 1px;
+
+  color: #929fb2;
+
+  font-size: 10.5px;
+  font-weight: 450;
+  line-height: 1.25;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* Variantes                                                                  */
+/* -------------------------------------------------------------------------- */
+
+/* Cyan */
 
 .session-card--1 {
-  border-left-color: #45c5f5;
-  background: linear-gradient(100deg, rgba(69, 197, 245, 0.14), rgba(24, 42, 59, 0.42));
+  border-color:
+    rgba(69, 197, 245, 0.18);
+
+  border-left-color:
+    #45c5f5;
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(69, 197, 245, 0.15),
+      rgba(22, 41, 60, 0.48)
+    );
 }
+
+.session-card--1:hover {
+  border-color:
+    rgba(69, 197, 245, 0.32);
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(69, 197, 245, 0.21),
+      rgba(24, 47, 68, 0.58)
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 0 3px rgba(69, 197, 245, 0.035),
+    0 12px 30px rgba(0, 0, 0, 0.22),
+    0 5px 22px rgba(69, 197, 245, 0.06);
+}
+
+
+/* Vert */
 
 .session-card--2 {
-  border-left-color: #45d5a3;
-  background: linear-gradient(100deg, rgba(69, 213, 163, 0.13), rgba(23, 46, 47, 0.40));
+  border-color:
+    rgba(69, 213, 163, 0.17);
+
+  border-left-color:
+    #45d5a3;
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(69, 213, 163, 0.14),
+      rgba(21, 44, 46, 0.46)
+    );
 }
+
+.session-card--2:hover {
+  border-color:
+    rgba(69, 213, 163, 0.30);
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(69, 213, 163, 0.19),
+      rgba(23, 51, 51, 0.56)
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 0 3px rgba(69, 213, 163, 0.03),
+    0 12px 30px rgba(0, 0, 0, 0.22),
+    0 5px 22px rgba(69, 213, 163, 0.055);
+}
+
+
+/* Jaune / ambre */
 
 .session-card--3 {
-  border-left-color: #f6c760;
-  background: linear-gradient(100deg, rgba(246, 199, 96, 0.12), rgba(50, 45, 29, 0.38));
+  border-color:
+    rgba(246, 199, 96, 0.18);
+
+  border-left-color:
+    #f6c760;
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(246, 199, 96, 0.14),
+      rgba(52, 45, 28, 0.44)
+    );
 }
 
+.session-card--3:hover {
+  border-color:
+    rgba(246, 199, 96, 0.32);
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(246, 199, 96, 0.19),
+      rgba(59, 50, 29, 0.54)
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 0 3px rgba(246, 199, 96, 0.03),
+    0 12px 30px rgba(0, 0, 0, 0.22),
+    0 5px 22px rgba(246, 199, 96, 0.05);
+}
+
+
+/* Violet */
+
 .session-card--4 {
-  border-left-color: #b584f5;
-  background: linear-gradient(100deg, rgba(181, 132, 245, 0.14), rgba(45, 34, 57, 0.40));
+  border-color:
+    rgba(181, 132, 245, 0.19);
+
+  border-left-color:
+    #b584f5;
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(181, 132, 245, 0.16),
+      rgba(46, 34, 60, 0.46)
+    );
+}
+
+.session-card--4:hover {
+  border-color:
+    rgba(181, 132, 245, 0.34);
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(181, 132, 245, 0.21),
+      rgba(53, 39, 68, 0.56)
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 0 3px rgba(181, 132, 245, 0.035),
+    0 12px 30px rgba(0, 0, 0, 0.22),
+    0 5px 22px rgba(181, 132, 245, 0.06);
 }
