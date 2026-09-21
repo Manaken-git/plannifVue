@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useToast } from '../../../../app/providers/ToastProvider';
+import { useToast } from '../../../../app/providers/useToast';
 import { PageHeader } from '../../../../shared/ui/PageHeader/PageHeader';
 import { creneauxApi } from '../../api/creneaux.api';
 import { CreneauForm } from '../../components/CreneauForm/CreneauForm';

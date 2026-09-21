@@ -5,6 +5,8 @@
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
 }
 
+.app-shell.is-sidebar-collapsed{grid-template-columns:76px minmax(0,1fr)}
+
 .app-shell__main {
   position: relative;
   min-width: 0;
@@ -49,7 +51,11 @@
   }
 
   .app-shell__main {
-    padding: 14px;
+    padding: 12px;
     padding-bottom: 88px;
   }
+}
+
+@media (max-width: 420px) {
+  .app-shell__main { padding-inline: 8px; }
 }

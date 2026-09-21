@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useToast } from '../../../../app/providers/ToastProvider';
+import { useToast } from '../../../../app/providers/useToast';
 import { PageHeader } from '../../../../shared/ui/PageHeader/PageHeader';
 import { vacancesApi } from '../../api/vacances.api';
 import { VacancesForm } from '../../components/VacancesForm/VacancesForm';
