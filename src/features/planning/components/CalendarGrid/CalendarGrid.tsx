@@ -1179,7 +1179,8 @@ export function CalendarGrid({
                       const classe = classes.find((c) => c.nom === seance.classeNom);
                       let warning: string | undefined;
                       if (salle && classe) {
-                        const needed = seance.groupeNom && seance.groupeNom !== 'Classe entière'
+                        const grp = seance.groupe || seance.groupeNom;
+                        const needed = grp && grp !== 'Classe entière'
                           ? Math.ceil((classe.effectif ?? 30) / 2)
                           : (classe.effectif ?? 30);
                         if (salle.capacite < needed) {

@@ -18,6 +18,9 @@ export interface Classe {
   heureDebutMin?: string;
   heureFinMax?: string;
   maxHeuresParJour?: number;
-  dureePauseDejeunerMin?: number;
+  pauseDejeunerDebutMin?: string;
+  pauseDejeunerFinMax?: string;
+  pauseDejeunerDureeMin?: number;
+  dureePauseDejeunerMin?: number; // alias
   presences?: ClassePresence[];
 }

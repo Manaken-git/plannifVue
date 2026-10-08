@@ -81,8 +81,8 @@ export function ProfesseursTable({ items, searchTerm, onSearchChange, onEdit, on
                   </td>
                   <td>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', fontSize: '0.82rem' }}>
-                      {item.pauseDejeunerRequise !== false ? (
-                        <span style={{ color: 'var(--success, #10b981)' }}>✓ Pause repas requise</span>
+                      {(item.pauseDejeunerDureeMin != null ? item.pauseDejeunerDureeMin > 0 : item.pauseDejeunerRequise !== false) ? (
+                        <span style={{ color: 'var(--success, #10b981)' }}>✓ Pause repas requise ({item.pauseDejeunerDureeMin ?? 60}m)</span>
                       ) : (
                         <span style={{ color: 'var(--text-muted, #888)' }}>Pause repas libre</span>
                       )}
@@ -102,9 +102,10 @@ export function ProfesseursTable({ items, searchTerm, onSearchChange, onEdit, on
                       </div>
                     ) : item.daysOff?.length ? (
                       <div className="entity-table__chips">
-                        {item.daysOff.map((day) => (
-                          <Badge key={day.id ?? day.jourSemaine} tone="danger">{dayNames[day.jourSemaine] ?? day.jourSemaine}</Badge>
-                        ))}
+                        {item.daysOff.map((day) => {
+                          const j = day.jourSemaine ?? day.dayOfWeek ?? 1;
+                          return <Badge key={day.id ?? j} tone="danger">{dayNames[j] ?? j}</Badge>;
+                        })}
                       </div>
                     ) : (
                       <span className="entity-table__muted">Disponible 100%</span>

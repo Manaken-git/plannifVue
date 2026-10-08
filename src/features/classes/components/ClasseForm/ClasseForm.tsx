@@ -24,7 +24,7 @@ export function ClasseForm({ open, mode, item, loading, onClose, onSave, onDelet
     setHeureDebutMin(item?.heureDebutMin ?? '08:00');
     setHeureFinMax(item?.heureFinMax ?? '18:00');
     setMaxHeuresParJour(item?.maxHeuresParJour ?? 7);
-    setDureePauseDejeunerMin(item?.dureePauseDejeunerMin ?? 90);
+    setDureePauseDejeunerMin(item?.pauseDejeunerDureeMin ?? item?.dureePauseDejeunerMin ?? 90);
     setGroupes(item?.groupes ? [...item.groupes] : []);
     setPresences(item?.presences ? [...item.presences] : []);
   }, [item, open]);
@@ -52,7 +52,10 @@ export function ClasseForm({ open, mode, item, loading, onClose, onSave, onDelet
       heureDebutMin: heureDebutMin || '08:00',
       heureFinMax: heureFinMax || '18:00',
       maxHeuresParJour: maxHeuresParJour === '' ? undefined : maxHeuresParJour,
-      dureePauseDejeunerMin: dureePauseDejeunerMin === '' ? undefined : dureePauseDejeunerMin,
+      pauseDejeunerDebutMin: '11:30',
+      pauseDejeunerFinMax: '14:00',
+      pauseDejeunerDureeMin: dureePauseDejeunerMin === '' ? undefined : Number(dureePauseDejeunerMin),
+      dureePauseDejeunerMin: dureePauseDejeunerMin === '' ? undefined : Number(dureePauseDejeunerMin),
       groupes,
       presences,
     });

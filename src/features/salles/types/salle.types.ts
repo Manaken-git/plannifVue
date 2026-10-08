@@ -4,5 +4,6 @@ export interface Salle {
   capacite: number;
   type: string;
   batiment?: string;
+  etage?: number;
   equipements?: string[];
 }

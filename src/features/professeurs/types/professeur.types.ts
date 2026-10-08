@@ -8,13 +8,18 @@ export interface PlageHoraire {
 
 export interface ProfesseurDayOff {
   id?: number;
-  jourSemaine: number;
+  dayOfWeek?: number;
+  jourSemaine?: number; // alias
+  demiJournee?: string; // 'JOURNEE_ENTIERE' | 'MATIN' | 'APRES_MIDI' | 'CRENEAU'
+  heureDebut?: string;
+  heureFin?: string;
 }
 
 export type PlageIndisponibilite = 'MATIN' | 'APRES_MIDI' | 'JOURNEE' | 'CRENEAU';
 
 export interface ProfesseurIndisponibilite {
   id?: number;
+  dayOfWeek?: number;
   jourSemaine: number;
   plage: PlageIndisponibilite;
   creneauId?: number;
@@ -32,6 +37,7 @@ export interface Professeur {
   maxHeuresParJour?: number;
   maxHeuresParSemaine?: number;
   maxHeuresParSeance?: number;
+  pauseDejeunerDureeMin?: number;
   plageHorairePreferee?: PlageHoraire | null;
   seances?: Seance[];
   daysOff?: ProfesseurDayOff[];

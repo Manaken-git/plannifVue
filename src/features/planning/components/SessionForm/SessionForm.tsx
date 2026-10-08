@@ -75,23 +75,31 @@ export function SessionForm({ open, mode, item, professeurs, classes, matieres, 
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const grp = groupeNom === 'Classe entière' ? undefined : groupeNom;
+    const align = alignementId.trim() || undefined;
     void onSave(
       {
         id: item?.id,
         debut,
         fin,
-        groupeNom: groupeNom === 'Classe entière' ? undefined : groupeNom,
+        type: typeSeance,
         typeSeance,
-        alignementId: alignementId.trim() || undefined,
+        groupe: grp,
+        groupeNom: grp,
+        alignementCode: align,
+        alignementId: align,
       },
       {
         professeurId: professeurId === '' ? undefined : professeurId,
         classeId: classeId === '' ? undefined : classeId,
         matiereId: matiereId === '' ? undefined : matiereId,
         salleId: salleId === '' ? undefined : salleId,
-        groupeNom: groupeNom === 'Classe entière' ? undefined : groupeNom,
+        type: typeSeance,
         typeSeance,
-        alignementId: alignementId.trim() || undefined,
+        groupe: grp,
+        groupeNom: grp,
+        alignementCode: align,
+        alignementId: align,
       },
     );
   };

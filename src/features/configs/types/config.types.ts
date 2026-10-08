@@ -7,10 +7,16 @@ export interface MatiereClasseConfig {
   dateDebut?: string | null;
   dateFin?: string | null;
   volumeHorairePeriode?: number | null;
+  typeSalleRequis?: string;
+  dureeCoursMinutes?: number | null;
+  dureeTpMinutes?: number | null;
+  forteChargeCognitive?: boolean;
+  autoriserBlocDeuxHeures?: boolean;
+  equipementsRequis?: Array<{ id?: number; libelle?: string } | string>;
+
+  // Aliases de compatibilité
   prioriteMatin?: boolean;
   chargeCognitiveElevee?: boolean;
   autoriserBlocDouble?: boolean;
   dureeParDefautMinutes?: number | null;
-  equipementsRequis?: string[];
-  typeSalleRequis?: string;
 }

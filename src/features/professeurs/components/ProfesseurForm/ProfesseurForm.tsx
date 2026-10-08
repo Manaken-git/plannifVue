@@ -55,7 +55,8 @@ export function ProfesseurForm({ open, mode, item, matieres, loading, onClose, o
       });
     } else if (item?.daysOff && item.daysOff.length > 0) {
       item.daysOff.forEach((day) => {
-        initialMap[day.jourSemaine] = 'JOURNEE';
+        const j = day.jourSemaine ?? day.dayOfWeek ?? 1;
+        initialMap[j] = 'JOURNEE';
       });
     }
     setDayAvailabilities(initialMap);
@@ -101,8 +102,9 @@ export function ProfesseurForm({ open, mode, item, matieres, loading, onClose, o
       plageHorairePreferee: plage.trim() ? { libelle: plage.trim() } : null,
       batimentPrincipal: batimentPrincipal.trim() || undefined,
       pauseDejeunerRequise,
-      indisponibilites,
-      daysOff,
+      pauseDejeunerDureeMin: pauseDejeunerRequise ? 60 : undefined,
+      indisponibilites: indisponibilites.map((i) => ({ ...i, dayOfWeek: i.dayOfWeek ?? i.jourSemaine })),
+      daysOff: daysOff.map((d) => ({ ...d, dayOfWeek: d.dayOfWeek ?? d.jourSemaine, demiJournee: 'JOURNEE_ENTIERE' })),
       matieres: matieres.filter((matiere) => matiere.id && matiereIds.includes(matiere.id)),
       seances: item?.seances ?? [],
     });

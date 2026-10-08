@@ -53,18 +53,18 @@ export function SessionCard({ seance, top, height, left, width, warning, onClick
           {formatTime(seance.debut)} – {formatTime(seance.fin)}
         </span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-          {seance.groupeNom && (
+          {(seance.groupe || seance.groupeNom) && (
             <span style={{ fontSize: '9.5px', background: 'rgba(255,255,255,0.18)', padding: '1px 5px', borderRadius: '4px', fontWeight: 600 }}>
-              {seance.groupeNom}
+              {seance.groupe || seance.groupeNom}
             </span>
           )}
-          {seance.typeSeance && seance.typeSeance !== 'Cours' && (
+          {(seance.type || seance.typeSeance) && (seance.type || seance.typeSeance) !== 'Cours' && (
             <span style={{ fontSize: '9px', background: 'rgba(59,130,246,0.3)', padding: '1px 4px', borderRadius: '4px', fontWeight: 600 }}>
-              {seance.typeSeance}
+              {seance.type || seance.typeSeance}
             </span>
           )}
-          {seance.alignementId && (
-            <span title={`Alignement: ${seance.alignementId}`} style={{ fontSize: '9px', background: 'rgba(168,85,247,0.3)', padding: '1px 4px', borderRadius: '4px' }}>
+          {(seance.alignementCode || seance.alignementId) && (
+            <span title={`Alignement: ${seance.alignementCode || seance.alignementId}`} style={{ fontSize: '9px', background: 'rgba(168,85,247,0.3)', padding: '1px 4px', borderRadius: '4px' }}>
               ⚡
             </span>
           )}

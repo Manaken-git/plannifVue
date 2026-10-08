@@ -56,7 +56,7 @@ export function ClassesTable({ items, searchTerm, onSearchChange, onEdit, onDele
                   </td>
                   <td>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '0.82rem' }}>
-                      <span>Repas : {item.dureePauseDejeunerMin ?? 90} min min.</span>
+                      <span>Repas : {item.pauseDejeunerDureeMin ?? item.dureePauseDejeunerMin ?? 90} min min.</span>
                       <span style={{ color: 'var(--text-muted, #888)' }}>
                         {item.heureDebutMin ?? '08:00'} → {item.heureFinMax ?? '18:00'} (max {item.maxHeuresParJour ?? 7}h/j)
                       </span>

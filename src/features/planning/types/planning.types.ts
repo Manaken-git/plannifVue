@@ -6,9 +6,12 @@ export interface Seance {
   classeNom?: string;
   matiereNom?: string;
   salleCode?: string;
-  groupeNom?: string;
-  typeSeance?: string;
-  alignementId?: string;
+  type?: string;
+  typeSeance?: string; // alias
+  groupe?: string;
+  groupeNom?: string; // alias
+  alignementCode?: string;
+  alignementId?: string; // alias
   equipementsRequis?: string[];
 }
 
@@ -17,8 +20,11 @@ export interface SessionAssociations {
   classeId?: number;
   matiereId?: number;
   salleId?: number;
-  groupeNom?: string;
+  type?: string;
   typeSeance?: string;
+  groupe?: string;
+  groupeNom?: string;
+  alignementCode?: string;
   alignementId?: string;
 }
 

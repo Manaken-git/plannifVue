@@ -20,3 +20,24 @@ export interface ConstraintConfiguration {
   description?: string;
   constraints: ConstraintConfigItem[];
 }
+
+export interface ScoreConstraintConfigDTO {
+  id?: number;
+  nom: string;
+  isDefault?: boolean;
+  roomConflictWeight?: number;
+  teacherConflictWeight?: number;
+  studentGroupConflictWeight?: number;
+  teacherDayOffWeight?: number;
+  teacherMaxHoursPerDayWeight?: number;
+  teacherMaxHoursPerWeekWeight?: number;
+  teacherMaxGapWeight?: number;
+  seanceDurationMatchWeight?: number;
+  studentLunchBreakWeight?: number;
+  teacherLunchBreakWeight?: number;
+  studentDailySpanWeight?: number;
+  studentGapWeight?: number;
+  travelDistanceWeight?: number;
+  cognitiveLoadMorningWeight?: number;
+  twoHourBlockWeight?: number;
+}

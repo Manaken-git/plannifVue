@@ -1,7 +1,7 @@
 {
   "meta": {
     "name": "Plannif'Edu — jeu de données de démonstration",
-    "version": 3,
+    "version": 4,
     "referenceWeek": "2026-08-17",
     "description": "Données locales utilisées lorsque VITE_USE_MOCK_DATA=true."
   },
@@ -22,7 +22,9 @@
       "daysOff": [
         {
           "id": 1,
-          "jourSemaine": 5
+          "jourSemaine": 5,
+          "dayOfWeek": 5,
+          "demiJournee": "JOURNEE_ENTIERE"
         }
       ],
       "matieres": [
@@ -45,7 +47,8 @@
           "plage": "JOURNEE",
           "motif": "Temps partiel"
         }
-      ]
+      ],
+      "pauseDejeunerDureeMin": 60
     },
     {
       "id": 2,
@@ -63,7 +66,9 @@
       "daysOff": [
         {
           "id": 2,
-          "jourSemaine": 2
+          "jourSemaine": 2,
+          "dayOfWeek": 2,
+          "demiJournee": "JOURNEE_ENTIERE"
         }
       ],
       "matieres": [
@@ -92,7 +97,8 @@
           "plage": "MATIN",
           "motif": "Vœu horaire"
         }
-      ]
+      ],
+      "pauseDejeunerDureeMin": 60
     },
     {
       "id": 3,
@@ -110,7 +116,9 @@
       "daysOff": [
         {
           "id": 3,
-          "jourSemaine": 3
+          "jourSemaine": 3,
+          "dayOfWeek": 3,
+          "demiJournee": "JOURNEE_ENTIERE"
         }
       ],
       "matieres": [
@@ -133,7 +141,8 @@
           "plage": "JOURNEE",
           "motif": "Jour libéré"
         }
-      ]
+      ],
+      "pauseDejeunerDureeMin": 60
     },
     {
       "id": 4,
@@ -169,7 +178,8 @@
           "plage": "MATIN",
           "motif": "Réunion département"
         }
-      ]
+      ],
+      "pauseDejeunerDureeMin": 60
     },
     {
       "id": 5,
@@ -187,7 +197,9 @@
       "daysOff": [
         {
           "id": 4,
-          "jourSemaine": 1
+          "jourSemaine": 1,
+          "dayOfWeek": 1,
+          "demiJournee": "JOURNEE_ENTIERE"
         }
       ],
       "matieres": [
@@ -210,7 +222,8 @@
           "plage": "JOURNEE",
           "motif": "Jour libéré"
         }
-      ]
+      ],
+      "pauseDejeunerDureeMin": 60
     },
     {
       "id": 6,
@@ -246,7 +259,8 @@
           "plage": "APRES_MIDI",
           "motif": "Formation"
         }
-      ]
+      ],
+      "pauseDejeunerDureeMin": 60
     }
   ],
   "classes": [
@@ -281,7 +295,10 @@
       "heureDebutMin": "08:00",
       "heureFinMax": "18:00",
       "maxHeuresParJour": 7,
-      "dureePauseDejeunerMin": 90
+      "dureePauseDejeunerMin": 90,
+      "pauseDejeunerDureeMin": 90,
+      "pauseDejeunerDebutMin": "11:30",
+      "pauseDejeunerFinMax": "14:00"
     },
     {
       "id": 2,
@@ -314,7 +331,10 @@
       "heureDebutMin": "08:00",
       "heureFinMax": "18:00",
       "maxHeuresParJour": 7,
-      "dureePauseDejeunerMin": 90
+      "dureePauseDejeunerMin": 90,
+      "pauseDejeunerDureeMin": 90,
+      "pauseDejeunerDebutMin": "11:30",
+      "pauseDejeunerFinMax": "14:00"
     },
     {
       "id": 3,
@@ -342,7 +362,10 @@
       "heureDebutMin": "08:00",
       "heureFinMax": "18:00",
       "maxHeuresParJour": 7,
-      "dureePauseDejeunerMin": 90
+      "dureePauseDejeunerMin": 90,
+      "pauseDejeunerDureeMin": 90,
+      "pauseDejeunerDebutMin": "11:30",
+      "pauseDejeunerFinMax": "14:00"
     },
     {
       "id": 4,
@@ -370,7 +393,10 @@
       "heureDebutMin": "08:00",
       "heureFinMax": "18:00",
       "maxHeuresParJour": 7,
-      "dureePauseDejeunerMin": 90
+      "dureePauseDejeunerMin": 90,
+      "pauseDejeunerDureeMin": 90,
+      "pauseDejeunerDebutMin": "11:30",
+      "pauseDejeunerFinMax": "14:00"
     },
     {
       "id": 5,
@@ -398,7 +424,10 @@
       "heureDebutMin": "08:00",
       "heureFinMax": "18:00",
       "maxHeuresParJour": 7,
-      "dureePauseDejeunerMin": 90
+      "dureePauseDejeunerMin": 90,
+      "pauseDejeunerDureeMin": 90,
+      "pauseDejeunerDebutMin": "11:30",
+      "pauseDejeunerFinMax": "14:00"
     }
   ],
   "eleves": [
@@ -789,7 +818,11 @@
         "Informatique"
       ],
       "typeSalleRequis": "Informatique",
-      "prioriteMatin": false
+      "prioriteMatin": false,
+      "forteChargeCognitive": false,
+      "autoriserBlocDeuxHeures": true,
+      "dureeCoursMinutes": 60,
+      "dureeTpMinutes": 90
     },
     {
       "id": 2,
@@ -807,7 +840,11 @@
         "Informatique"
       ],
       "typeSalleRequis": "Informatique",
-      "prioriteMatin": false
+      "prioriteMatin": false,
+      "forteChargeCognitive": false,
+      "autoriserBlocDeuxHeures": false,
+      "dureeCoursMinutes": 60,
+      "dureeTpMinutes": 90
     },
     {
       "id": 3,
@@ -825,7 +862,11 @@
         "Vidéoprojecteur"
       ],
       "typeSalleRequis": "Cours",
-      "prioriteMatin": true
+      "prioriteMatin": true,
+      "forteChargeCognitive": true,
+      "autoriserBlocDeuxHeures": false,
+      "dureeCoursMinutes": 60,
+      "dureeTpMinutes": 90
     },
     {
       "id": 4,
@@ -843,7 +884,11 @@
         "Informatique"
       ],
       "typeSalleRequis": "TP",
-      "prioriteMatin": false
+      "prioriteMatin": false,
+      "forteChargeCognitive": false,
+      "autoriserBlocDeuxHeures": false,
+      "dureeCoursMinutes": 90,
+      "dureeTpMinutes": 90
     },
     {
       "id": 5,
@@ -861,7 +906,11 @@
         "Informatique"
       ],
       "typeSalleRequis": "Informatique",
-      "prioriteMatin": false
+      "prioriteMatin": false,
+      "forteChargeCognitive": false,
+      "autoriserBlocDeuxHeures": true,
+      "dureeCoursMinutes": 60,
+      "dureeTpMinutes": 90
     },
     {
       "id": 6,
@@ -879,7 +928,11 @@
         "Informatique"
       ],
       "typeSalleRequis": "TP",
-      "prioriteMatin": false
+      "prioriteMatin": false,
+      "forteChargeCognitive": false,
+      "autoriserBlocDeuxHeures": true,
+      "dureeCoursMinutes": 90,
+      "dureeTpMinutes": 90
     },
     {
       "id": 7,
@@ -897,7 +950,11 @@
         "Informatique"
       ],
       "typeSalleRequis": "Informatique",
-      "prioriteMatin": false
+      "prioriteMatin": false,
+      "forteChargeCognitive": false,
+      "autoriserBlocDeuxHeures": false,
+      "dureeCoursMinutes": 60,
+      "dureeTpMinutes": 90
     },
     {
       "id": 8,
@@ -915,7 +972,11 @@
         "Informatique"
       ],
       "typeSalleRequis": "Informatique",
-      "prioriteMatin": true
+      "prioriteMatin": true,
+      "forteChargeCognitive": true,
+      "autoriserBlocDeuxHeures": true,
+      "dureeCoursMinutes": 60,
+      "dureeTpMinutes": 90
     },
     {
       "id": 9,
@@ -933,7 +994,11 @@
         "Vidéoprojecteur"
       ],
       "typeSalleRequis": "Cours",
-      "prioriteMatin": true
+      "prioriteMatin": true,
+      "forteChargeCognitive": true,
+      "autoriserBlocDeuxHeures": true,
+      "dureeCoursMinutes": 60,
+      "dureeTpMinutes": 90
     },
     {
       "id": 10,
@@ -951,7 +1016,11 @@
         "Informatique"
       ],
       "typeSalleRequis": "Informatique",
-      "prioriteMatin": false
+      "prioriteMatin": false,
+      "forteChargeCognitive": false,
+      "autoriserBlocDeuxHeures": true,
+      "dureeCoursMinutes": 60,
+      "dureeTpMinutes": 90
     }
   ],
   "seances": [
@@ -966,7 +1035,13 @@
       "professeurNomComplet": "Claire Martin",
       "classeNom": "BTS SIO 1 - SLAM",
       "matiereNom": "Mathématiques",
-      "salleCode": "A101"
+      "salleCode": "A101",
+      "type": "Cours",
+      "typeSeance": "Cours",
+      "groupe": null,
+      "groupeNom": null,
+      "alignementCode": null,
+      "alignementId": null
     },
     {
       "id": 2,
@@ -979,7 +1054,13 @@
       "professeurNomComplet": "Lucas Bernard",
       "classeNom": "BTS SIO 2 - SLAM",
       "matiereNom": "Développement Web",
-      "salleCode": "B201"
+      "salleCode": "B201",
+      "type": "Cours",
+      "typeSeance": "Cours",
+      "groupe": null,
+      "groupeNom": null,
+      "alignementCode": null,
+      "alignementId": null
     },
     {
       "id": 3,
@@ -992,7 +1073,13 @@
       "professeurNomComplet": "Nicolas Petit",
       "classeNom": "BTS SIO 1 - SISR",
       "matiereNom": "Cybersécurité",
-      "salleCode": "CYBER-1"
+      "salleCode": "CYBER-1",
+      "type": "Cours",
+      "typeSeance": "Cours",
+      "groupe": null,
+      "groupeNom": null,
+      "alignementCode": null,
+      "alignementId": null
     },
     {
       "id": 4,
@@ -1005,7 +1092,13 @@
       "professeurNomComplet": "Sophie Robert",
       "classeNom": "BTS SIO 1 - SLAM",
       "matiereNom": "Français",
-      "salleCode": "A204"
+      "salleCode": "A204",
+      "type": "Cours",
+      "typeSeance": "Cours",
+      "groupe": null,
+      "groupeNom": null,
+      "alignementCode": null,
+      "alignementId": null
     },
     {
       "id": 5,
@@ -1018,7 +1111,13 @@
       "professeurNomComplet": "Thomas Moreau",
       "classeNom": "BUT Informatique 1",
       "matiereNom": "Algorithmique",
-      "salleCode": "B202"
+      "salleCode": "B202",
+      "type": "Cours",
+      "typeSeance": "Cours",
+      "groupe": null,
+      "groupeNom": null,
+      "alignementCode": null,
+      "alignementId": null
     },
     {
       "id": 6,
@@ -1031,7 +1130,13 @@
       "professeurNomComplet": "Emma Dubois",
       "classeNom": "BTS SIO 2 - SLAM",
       "matiereNom": "Culture économique",
-      "salleCode": "C103"
+      "salleCode": "C103",
+      "type": "Cours",
+      "typeSeance": "Cours",
+      "groupe": null,
+      "groupeNom": null,
+      "alignementCode": null,
+      "alignementId": null
     },
     {
       "id": 7,
@@ -1044,7 +1149,13 @@
       "professeurNomComplet": "Lucas Bernard",
       "classeNom": "Licence Pro Web",
       "matiereNom": "Développement Web",
-      "salleCode": "B201"
+      "salleCode": "B201",
+      "type": "Cours",
+      "typeSeance": "Cours",
+      "groupe": null,
+      "groupeNom": null,
+      "alignementCode": null,
+      "alignementId": null
     },
     {
       "id": 8,
@@ -1057,7 +1168,13 @@
       "professeurNomComplet": "Claire Martin",
       "classeNom": "BUT Informatique 1",
       "matiereNom": "Mathématiques",
-      "salleCode": "AMPHI-A"
+      "salleCode": "AMPHI-A",
+      "type": "Cours",
+      "typeSeance": "Cours",
+      "groupe": null,
+      "groupeNom": null,
+      "alignementCode": null,
+      "alignementId": null
     },
     {
       "id": 9,
@@ -1070,7 +1187,13 @@
       "professeurNomComplet": "Nicolas Petit",
       "classeNom": "BTS SIO 2 - SLAM",
       "matiereNom": "Bases de données",
-      "salleCode": "LAB-1"
+      "salleCode": "LAB-1",
+      "type": "Cours",
+      "typeSeance": "Cours",
+      "groupe": null,
+      "groupeNom": null,
+      "alignementCode": null,
+      "alignementId": null
     },
     {
       "id": 10,
@@ -1083,7 +1206,13 @@
       "professeurNomComplet": "Thomas Moreau",
       "classeNom": "BTS SIO 1 - SLAM",
       "matiereNom": "Développement Web",
-      "salleCode": "B202"
+      "salleCode": "B202",
+      "type": "Cours",
+      "typeSeance": "Cours",
+      "groupe": null,
+      "groupeNom": null,
+      "alignementCode": null,
+      "alignementId": null
     },
     {
       "id": 11,
@@ -1096,7 +1225,13 @@
       "professeurNomComplet": "Sophie Robert",
       "classeNom": "BTS SIO 1 - SISR",
       "matiereNom": "Anglais",
-      "salleCode": "A101"
+      "salleCode": "A101",
+      "type": "Cours",
+      "typeSeance": "Cours",
+      "groupe": null,
+      "groupeNom": null,
+      "alignementCode": null,
+      "alignementId": null
     },
     {
       "id": 12,
@@ -1109,7 +1244,13 @@
       "professeurNomComplet": "Nicolas Petit",
       "classeNom": "BTS SIO 1 - SISR",
       "matiereNom": "Cybersécurité",
-      "salleCode": "CYBER-1"
+      "salleCode": "CYBER-1",
+      "type": "Cours",
+      "typeSeance": "Cours",
+      "groupe": null,
+      "groupeNom": null,
+      "alignementCode": null,
+      "alignementId": null
     },
     {
       "id": 13,
@@ -1125,7 +1266,10 @@
       "professeurNomComplet": "Thomas Moreau",
       "classeNom": "BTS SIO 1 - SLAM",
       "matiereNom": "Développement Web",
-      "salleCode": "B201"
+      "salleCode": "B201",
+      "type": "TP",
+      "groupe": "Groupe A",
+      "alignementCode": "ALIGN-TP-SLAM"
     },
     {
       "id": 14,
@@ -1141,7 +1285,10 @@
       "professeurNomComplet": "Lucas Bernard",
       "classeNom": "BTS SIO 1 - SLAM",
       "matiereNom": "Bases de données",
-      "salleCode": "B202"
+      "salleCode": "B202",
+      "type": "TP",
+      "groupe": "Groupe B",
+      "alignementCode": "ALIGN-TP-SLAM"
     }
   ],
   "vacances": [

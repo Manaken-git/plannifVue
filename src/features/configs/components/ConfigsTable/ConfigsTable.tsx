@@ -64,7 +64,7 @@ export function ConfigsTable({ items, searchTerm, onSearchChange, onEdit, onDele
                         <span className="entity-table__muted">—</span>
                       )}
                       <span style={{ fontSize: '0.78rem', color: 'var(--text-muted, #888)' }}>
-                        Séance : {item.dureeParDefautMinutes ?? 60} min
+                        Cours: {item.dureeCoursMinutes ?? item.dureeParDefautMinutes ?? 60}m · TP: {item.dureeTpMinutes ?? 90}m
                       </span>
                       {(item.dateDebut || item.dateFin) && (
                         <span style={{ fontSize: '0.74rem', color: 'var(--text-muted, #888)' }}>
@@ -75,13 +75,13 @@ export function ConfigsTable({ items, searchTerm, onSearchChange, onEdit, onDele
                   </td>
                   <td>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                      {(item.prioriteMatin ?? item.chargeCognitiveElevee) && (
+                      {(item.forteChargeCognitive ?? item.prioriteMatin ?? item.chargeCognitiveElevee) && (
                         <Badge tone="danger">Matin prioritaire</Badge>
                       )}
-                      {item.autoriserBlocDouble && (
+                      {(item.autoriserBlocDeuxHeures ?? item.autoriserBlocDouble) && (
                         <Badge tone="info">Blocs de 2h</Badge>
                       )}
-                      {!(item.prioriteMatin ?? item.chargeCognitiveElevee) && !item.autoriserBlocDouble && (
+                      {!(item.forteChargeCognitive ?? item.prioriteMatin ?? item.chargeCognitiveElevee) && !(item.autoriserBlocDeuxHeures ?? item.autoriserBlocDouble) && (
                         <span className="entity-table__muted">Standard</span>
                       )}
                     </div>
@@ -93,9 +93,10 @@ export function ConfigsTable({ items, searchTerm, onSearchChange, onEdit, onDele
                       </span>
                       {item.equipementsRequis && item.equipementsRequis.length > 0 ? (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
-                          {item.equipementsRequis.map((eq) => (
-                            <Badge key={eq} tone="neutral">{eq}</Badge>
-                          ))}
+                          {item.equipementsRequis.map((eq) => {
+                            const label = typeof eq === 'string' ? eq : eq.libelle ?? `Équipement #${eq.id}`;
+                            return <Badge key={label} tone="neutral">{label}</Badge>;
+                          })}
                         </div>
                       ) : null}
                     </div>

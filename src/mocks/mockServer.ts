@@ -276,11 +276,14 @@ export async function mockRequest<T>(path: string, init?: RequestInit): Promise<
   const { url, segments } = getRoute(path);
   const method = (init?.method ?? 'GET').toUpperCase();
   const [endpoint, action, idSegment] = segments;
-  if (endpoint === 'constraints') {
-    if (action === 'config' && method === 'GET') {
+  if (endpoint === 'constraints' || endpoint === 'constraint-configs') {
+    if ((action === 'config' || action === 'default') && method === 'GET') {
       return clone(database.constraintsConfig ?? { nom: 'Config par défaut', constraints: [] }) as T;
     }
-    if (action === 'config' && (method === 'PUT' || method === 'POST')) {
+    if (action === 'list' && method === 'GET') {
+      return clone([database.constraintsConfig ?? { nom: 'Config par défaut', constraints: [] }]) as T;
+    }
+    if ((action === 'config' || action === 'save') && (method === 'PUT' || method === 'POST')) {
       const payload = parseBody(init) as unknown as ConstraintConfiguration;
       database.constraintsConfig = payload;
       persist(database);
@@ -430,10 +433,14 @@ function csvRowToItem(database: MockDatabase, collection: CollectionName, row: J
       dateDebut: text(row, 'dateDebut', 'debut') || null,
       dateFin: text(row, 'dateFin', 'fin') || null,
       volumeHorairePeriode: number(row, 'volumeHorairePeriode', 'volume'),
-      prioriteMatin: text(row, 'prioriteMatin', 'chargeCognitiveElevee').toLowerCase() === 'true',
-      chargeCognitiveElevee: text(row, 'prioriteMatin', 'chargeCognitiveElevee').toLowerCase() === 'true',
-      autoriserBlocDouble: text(row, 'autoriserBlocDouble').toLowerCase() === 'true',
-      dureeParDefautMinutes: number(row, 'dureeParDefautMinutes', 'duree') ?? 60,
+      forteChargeCognitive: text(row, 'forteChargeCognitive', 'prioriteMatin', 'chargeCognitiveElevee').toLowerCase() === 'true',
+      prioriteMatin: text(row, 'forteChargeCognitive', 'prioriteMatin', 'chargeCognitiveElevee').toLowerCase() === 'true',
+      chargeCognitiveElevee: text(row, 'forteChargeCognitive', 'prioriteMatin', 'chargeCognitiveElevee').toLowerCase() === 'true',
+      autoriserBlocDeuxHeures: text(row, 'autoriserBlocDeuxHeures', 'autoriserBlocDouble').toLowerCase() === 'true',
+      autoriserBlocDouble: text(row, 'autoriserBlocDeuxHeures', 'autoriserBlocDouble').toLowerCase() === 'true',
+      dureeCoursMinutes: number(row, 'dureeCoursMinutes', 'dureeParDefautMinutes', 'duree') ?? 60,
+      dureeTpMinutes: number(row, 'dureeTpMinutes') ?? 90,
+      dureeParDefautMinutes: number(row, 'dureeCoursMinutes', 'dureeParDefautMinutes', 'duree') ?? 60,
       typeSalleRequis: text(row, 'typeSalleRequis') || 'Cours',
       equipementsRequis: equipementsStr ? equipementsStr.split(',').map((s) => s.trim()).filter(Boolean) : [],
     };
@@ -444,6 +451,9 @@ function csvRowToItem(database: MockDatabase, collection: CollectionName, row: J
     const classeValue = text(row, 'classeNom', 'classe');
     const matiereValue = text(row, 'matiereNom', 'matiere');
     const salleValue = text(row, 'salleCode', 'salle');
+    const typeValue = text(row, 'type', 'typeSeance') || 'Cours';
+    const groupeValue = text(row, 'groupe', 'groupeNom') || undefined;
+    const alignementValue = text(row, 'alignementCode', 'alignementId') || undefined;
     return {
       debut: text(row, 'debut'),
       fin: text(row, 'fin'),
@@ -451,6 +461,12 @@ function csvRowToItem(database: MockDatabase, collection: CollectionName, row: J
       classeId: number(row, 'classeId') ?? resolveByName(database.classes, (item) => item.nom, classeValue),
       matiereId: number(row, 'matiereId') ?? resolveByName(database.matieres, (item) => item.nom, matiereValue),
       salleId: number(row, 'salleId') ?? resolveByName(database.salles, (item) => item.code, salleValue),
+      type: typeValue,
+      typeSeance: typeValue,
+      groupe: groupeValue,
+      groupeNom: groupeValue,
+      alignementCode: alignementValue,
+      alignementId: alignementValue,
     };
   }
 

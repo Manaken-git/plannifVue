@@ -12,9 +12,10 @@ export function ConfigForm({ open, mode, item, classes, matieres, loading, onClo
   const [dateDebut, setDateDebut] = useState('');
   const [dateFin, setDateFin] = useState('');
   const [volume, setVolume] = useState<number | ''>('');
-  const [prioriteMatin, setPrioriteMatin] = useState(false);
-  const [autoriserBlocDouble, setAutoriserBlocDouble] = useState(false);
-  const [dureeParDefautMinutes, setDureeParDefautMinutes] = useState<number | ''>(60);
+  const [forteChargeCognitive, setForteChargeCognitive] = useState(false);
+  const [autoriserBlocDeuxHeures, setAutoriserBlocDeuxHeures] = useState(false);
+  const [dureeCoursMinutes, setDureeCoursMinutes] = useState<number | ''>(60);
+  const [dureeTpMinutes, setDureeTpMinutes] = useState<number | ''>(90);
   const [typeSalleRequis, setTypeSalleRequis] = useState('Cours');
   const [equipementsRequis, setEquipementsRequis] = useState<string[]>([]);
 
@@ -26,11 +27,13 @@ export function ConfigForm({ open, mode, item, classes, matieres, loading, onClo
     setDateDebut(item?.dateDebut ?? '');
     setDateFin(item?.dateFin ?? '');
     setVolume(item?.volumeHorairePeriode ?? '');
-    setPrioriteMatin(item?.prioriteMatin ?? item?.chargeCognitiveElevee ?? false);
-    setAutoriserBlocDouble(item?.autoriserBlocDouble ?? false);
-    setDureeParDefautMinutes(item?.dureeParDefautMinutes ?? 60);
+    setForteChargeCognitive(item?.forteChargeCognitive ?? item?.prioriteMatin ?? item?.chargeCognitiveElevee ?? false);
+    setAutoriserBlocDeuxHeures(item?.autoriserBlocDeuxHeures ?? item?.autoriserBlocDouble ?? false);
+    setDureeCoursMinutes(item?.dureeCoursMinutes ?? item?.dureeParDefautMinutes ?? 60);
+    setDureeTpMinutes(item?.dureeTpMinutes ?? 90);
     setTypeSalleRequis(item?.typeSalleRequis ?? 'Cours');
-    setEquipementsRequis(item?.equipementsRequis ?? []);
+    const eqList = item?.equipementsRequis?.map((eq) => typeof eq === 'string' ? eq : eq.libelle || '') ?? [];
+    setEquipementsRequis(eqList.filter(Boolean));
   }, [item, open]);
 
   const toggleEquipment = (eq: string) => {
@@ -46,12 +49,17 @@ export function ConfigForm({ open, mode, item, classes, matieres, loading, onClo
       dateDebut: dateDebut || null,
       dateFin: dateFin || null,
       volumeHorairePeriode: volume === '' ? null : volume,
-      prioriteMatin,
-      chargeCognitiveElevee: prioriteMatin,
-      autoriserBlocDouble,
-      dureeParDefautMinutes: dureeParDefautMinutes === '' ? null : Number(dureeParDefautMinutes),
+      forteChargeCognitive,
+      autoriserBlocDeuxHeures,
+      dureeCoursMinutes: dureeCoursMinutes === '' ? null : Number(dureeCoursMinutes),
+      dureeTpMinutes: dureeTpMinutes === '' ? null : Number(dureeTpMinutes),
       typeSalleRequis,
       equipementsRequis,
+      // Compatibilité
+      prioriteMatin: forteChargeCognitive,
+      chargeCognitiveElevee: forteChargeCognitive,
+      autoriserBlocDouble: autoriserBlocDeuxHeures,
+      dureeParDefautMinutes: dureeCoursMinutes === '' ? null : Number(dureeCoursMinutes),
     });
   };
 
@@ -116,14 +124,25 @@ export function ConfigForm({ open, mode, item, classes, matieres, loading, onClo
           />
         </div>
         <div className="form-field">
-          <label>Durée attendue par séance (min)</label>
+          <label>Durée Cours standard (min)</label>
           <input
             type="number"
             min="15"
             step="15"
-            value={dureeParDefautMinutes}
-            onChange={(e) => setDureeParDefautMinutes(e.target.value === '' ? '' : Number(e.target.value))}
-            placeholder="Ex. 60, 90, 120"
+            value={dureeCoursMinutes}
+            onChange={(e) => setDureeCoursMinutes(e.target.value === '' ? '' : Number(e.target.value))}
+            placeholder="Ex. 60"
+          />
+        </div>
+        <div className="form-field">
+          <label>Durée TP (min)</label>
+          <input
+            type="number"
+            min="15"
+            step="15"
+            value={dureeTpMinutes}
+            onChange={(e) => setDureeTpMinutes(e.target.value === '' ? '' : Number(e.target.value))}
+            placeholder="Ex. 90, 120"
           />
         </div>
 
@@ -133,20 +152,20 @@ export function ConfigForm({ open, mode, item, classes, matieres, loading, onClo
             <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
               <input
                 type="checkbox"
-                checked={prioriteMatin}
-                onChange={(e) => setPrioriteMatin(e.target.checked)}
+                checked={forteChargeCognitive}
+                onChange={(e) => setForteChargeCognitive(e.target.checked)}
                 style={{ width: 'auto' }}
               />
-              <span>Priorité le matin (charge cognitive élevée)</span>
+              <span>Forte charge cognitive (priorité placement le matin)</span>
             </label>
             <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
               <input
                 type="checkbox"
-                checked={autoriserBlocDouble}
-                onChange={(e) => setAutoriserBlocDouble(e.target.checked)}
+                checked={autoriserBlocDeuxHeures}
+                onChange={(e) => setAutoriserBlocDeuxHeures(e.target.checked)}
                 style={{ width: 'auto' }}
               />
-              <span>Favoriser les blocs consécutifs de 2h d'affilée</span>
+              <span>Autoriser / favoriser les blocs de 2 heures</span>
             </label>
           </div>
         </section>
