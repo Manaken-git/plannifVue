@@ -8,6 +8,7 @@ import type { PlanningDTO, PlanningSaveDTO } from '../features/plannings/types/p
 import type { Professeur } from '../features/professeurs/types/professeur.types';
 import type { Salle } from '../features/salles/types/salle.types';
 import type { Vacances } from '../features/vacances/types/vacances.types';
+import type { ConstraintConfiguration } from '../features/configs/types/constraint.types';
 
 interface MockMeta {
   name: string;
@@ -37,12 +38,13 @@ interface MockDatabase {
   seances: MockSeance[];
   vacances: Vacances[];
   plannings: PlanningDTO[];
+  constraintsConfig?: ConstraintConfiguration;
 }
 
-type CollectionName = Exclude<keyof MockDatabase, 'meta'>;
+type CollectionName = Exclude<keyof MockDatabase, 'meta' | 'constraintsConfig'>;
 type JsonRecord = Record<string, unknown>;
 
-const STORAGE_KEY = 'plannif-edu:mock-db:v1';
+const STORAGE_KEY = 'plannif-edu:mock-db:v2';
 const MOCK_DATA_URL = '/mock-data.json';
 const DEFAULT_DELAY_MS = 110;
 
@@ -274,6 +276,18 @@ export async function mockRequest<T>(path: string, init?: RequestInit): Promise<
   const { url, segments } = getRoute(path);
   const method = (init?.method ?? 'GET').toUpperCase();
   const [endpoint, action, idSegment] = segments;
+  if (endpoint === 'constraints') {
+    if (action === 'config' && method === 'GET') {
+      return clone(database.constraintsConfig ?? { nom: 'Config par défaut', constraints: [] }) as T;
+    }
+    if (action === 'config' && (method === 'PUT' || method === 'POST')) {
+      const payload = parseBody(init) as unknown as ConstraintConfiguration;
+      database.constraintsConfig = payload;
+      persist(database);
+      return clone(database.constraintsConfig) as T;
+    }
+  }
+
   const collection = endpointToCollection[endpoint];
 
   if (!collection) throw new Error(`Route mock non gérée : ${method} ${url.pathname}`);
@@ -409,12 +423,19 @@ function csvRowToItem(database: MockDatabase, collection: CollectionName, row: J
   if (collection === 'configs') {
     const classeValue = text(row, 'classeNom', 'classe');
     const matiereValue = text(row, 'matiereNom', 'matiere');
+    const equipementsStr = text(row, 'equipementsRequis', 'equipements');
     return {
       classeId: number(row, 'classeId') ?? resolveByName(database.classes, (item) => item.nom, classeValue),
       matiereId: number(row, 'matiereId') ?? resolveByName(database.matieres, (item) => item.nom, matiereValue),
       dateDebut: text(row, 'dateDebut', 'debut') || null,
       dateFin: text(row, 'dateFin', 'fin') || null,
       volumeHorairePeriode: number(row, 'volumeHorairePeriode', 'volume'),
+      prioriteMatin: text(row, 'prioriteMatin', 'chargeCognitiveElevee').toLowerCase() === 'true',
+      chargeCognitiveElevee: text(row, 'prioriteMatin', 'chargeCognitiveElevee').toLowerCase() === 'true',
+      autoriserBlocDouble: text(row, 'autoriserBlocDouble').toLowerCase() === 'true',
+      dureeParDefautMinutes: number(row, 'dureeParDefautMinutes', 'duree') ?? 60,
+      typeSalleRequis: text(row, 'typeSalleRequis') || 'Cours',
+      equipementsRequis: equipementsStr ? equipementsStr.split(',').map((s) => s.trim()).filter(Boolean) : [],
     };
   }
 

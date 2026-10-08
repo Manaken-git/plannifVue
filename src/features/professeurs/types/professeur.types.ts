@@ -11,6 +11,18 @@ export interface ProfesseurDayOff {
   jourSemaine: number;
 }
 
+export type PlageIndisponibilite = 'MATIN' | 'APRES_MIDI' | 'JOURNEE' | 'CRENEAU';
+
+export interface ProfesseurIndisponibilite {
+  id?: number;
+  jourSemaine: number;
+  plage: PlageIndisponibilite;
+  creneauId?: number;
+  heureDebut?: string;
+  heureFin?: string;
+  motif?: string;
+}
+
 export interface Professeur {
   id?: number;
   nom: string;
@@ -23,5 +35,8 @@ export interface Professeur {
   plageHorairePreferee?: PlageHoraire | null;
   seances?: Seance[];
   daysOff?: ProfesseurDayOff[];
+  indisponibilites?: ProfesseurIndisponibilite[];
+  pauseDejeunerRequise?: boolean;
+  batimentPrincipal?: string;
   matieres?: Matiere[];
 }

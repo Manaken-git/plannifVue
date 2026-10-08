@@ -8,4 +8,5 @@ export type AppTab =
   | 'matieres'
   | 'salles'
   | 'configs'
+  | 'contraintes'
   | 'vacances';

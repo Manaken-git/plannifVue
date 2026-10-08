@@ -6,6 +6,10 @@ export interface Seance {
   classeNom?: string;
   matiereNom?: string;
   salleCode?: string;
+  groupeNom?: string;
+  typeSeance?: string;
+  alignementId?: string;
+  equipementsRequis?: string[];
 }
 
 export interface SessionAssociations {
@@ -13,6 +17,9 @@ export interface SessionAssociations {
   classeId?: number;
   matiereId?: number;
   salleId?: number;
+  groupeNom?: string;
+  typeSeance?: string;
+  alignementId?: string;
 }
 
 export type CalendarFilterType = 'all' | 'professeur' | 'classe' | 'matiere' | 'salle';

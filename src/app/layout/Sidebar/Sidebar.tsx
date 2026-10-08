@@ -11,6 +11,7 @@ import {
   UsersRound,
   PanelLeftClose,
   PanelLeftOpen,
+  Scale,
 } from 'lucide-react';
 import type { AppTab } from '../../navigation/navigation.types';
 import './Sidebar.css';
@@ -48,6 +49,7 @@ const groups: Array<{
     label: 'Configuration',
     items: [
       { id: 'configs', label: 'Config. matières', icon: SlidersHorizontal },
+      { id: 'contraintes', label: 'Règles du Solveur', icon: Scale },
       { id: 'vacances', label: 'Vacances scolaires', icon: SunMedium },
     ],
   },

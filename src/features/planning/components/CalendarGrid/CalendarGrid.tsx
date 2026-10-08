@@ -1120,49 +1120,87 @@ export function CalendarGrid({
                     ),
                   )}
 
-                  {/* Séances */}
+                  {/* Zone de pause méridienne lycée (11h30 - 14h00) */}
+                  {visibleRange.startHour <= 11.5 && visibleRange.endHour >= 14 && (
+                    <div
+                      className="calendar-grid__lunch-break"
+                      style={{
+                        position: 'absolute',
+                        top: (11.5 - visibleRange.startHour) * HOUR_HEIGHT,
+                        height: 2.5 * HOUR_HEIGHT,
+                        left: 0,
+                        right: 0,
+                        background: 'repeating-linear-gradient(45deg, rgba(245, 158, 11, 0.03), rgba(245, 158, 11, 0.03) 10px, transparent 10px, transparent 20px)',
+                        borderTop: '1px dashed rgba(245, 158, 11, 0.25)',
+                        borderBottom: '1px dashed rgba(245, 158, 11, 0.25)',
+                        pointerEvents: 'none',
+                        zIndex: 1,
+                      }}
+                    >
+                      <span style={{ fontSize: '10px', color: 'rgba(245, 158, 11, 0.7)', padding: '2px 6px', fontWeight: 500 }}>
+                        Pause méridienne
+                      </span>
+                    </div>
+                  )}
 
-                  {visible.map(
-                    (
-                      seance,
-                    ) => {
-                      const pos =
-                        position(
-                          seance,
-                        );
+                  {/* Séances avec support des demi-groupes parallèles et alertes */}
+                  {(() => {
+                    const daySessions = visible.filter((seance) => {
+                      const pos = position(seance);
+                      return pos && pos.dayIndex === dayIndex;
+                    });
 
-                      if (
-                        !pos ||
-                        pos.dayIndex !==
-                          dayIndex
-                      ) {
-                        return null;
+                    return daySessions.map((seance) => {
+                      const pos = position(seance)!;
+
+                      // Détection de chevauchement (demi-groupes / alignements)
+                      const overlapping = daySessions.filter((other) => {
+                        if (other === seance) return false;
+                        const s1 = new Date(seance.debut).getTime();
+                        const e1 = new Date(seance.fin).getTime();
+                        const s2 = new Date(other.debut).getTime();
+                        const e2 = new Date(other.fin).getTime();
+                        return s1 < e2 && s2 < e1;
+                      });
+
+                      let left: string | undefined;
+                      let width: string | undefined;
+
+                      if (overlapping.length > 0) {
+                        const allCluster = [seance, ...overlapping].sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
+                        const myIdx = allCluster.findIndex((s) => (s.id ?? s.debut) === (seance.id ?? seance.debut));
+                        const totalCol = allCluster.length;
+                        left = `calc(${myIdx * (100 / totalCol)}% + 3px)`;
+                        width = `calc(${100 / totalCol}% - 6px)`;
+                      }
+
+                      // Alerte de capacité de la salle vs effectif
+                      const salle = salles.find((s) => s.code === seance.salleCode);
+                      const classe = classes.find((c) => c.nom === seance.classeNom);
+                      let warning: string | undefined;
+                      if (salle && classe) {
+                        const needed = seance.groupeNom && seance.groupeNom !== 'Classe entière'
+                          ? Math.ceil((classe.effectif ?? 30) / 2)
+                          : (classe.effectif ?? 30);
+                        if (salle.capacite < needed) {
+                          warning = `Capacité insuffisante (${salle.capacite} places pour ${needed} élèves)`;
+                        }
                       }
 
                       return (
                         <SessionCard
-                          key={
-                            seance.id ??
-                            `${seance.debut}-${seance.matiereNom}`
-                          }
-                          seance={
-                            seance
-                          }
-                          top={
-                            pos.top
-                          }
-                          height={
-                            pos.height
-                          }
-                          onClick={() =>
-                            onEdit(
-                              seance,
-                            )
-                          }
+                          key={seance.id ?? `${seance.debut}-${seance.matiereNom}`}
+                          seance={seance}
+                          top={pos.top}
+                          height={pos.height}
+                          left={left}
+                          width={width}
+                          warning={warning}
+                          onClick={() => onEdit(seance)}
                         />
                       );
-                    },
-                  )}
+                    });
+                  })()}
 
                 </div>
               ),

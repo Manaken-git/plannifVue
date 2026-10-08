@@ -1,0 +1,114 @@
+.contraintes-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.contraintes-page__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.contraintes-stat-card {
+  background: var(--surface-card, #ffffff);
+  border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
+  border-radius: var(--radius-lg, 12px);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.contraintes-stat-card__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.contraintes-stat-card__icon.is-hard {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
+.contraintes-stat-card__icon.is-soft {
+  background: rgba(59, 130, 246, 0.12);
+  color: #3b82f6;
+}
+
+.contraintes-stat-card__icon.is-proportional {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+}
+
+.contraintes-stat-card strong {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary, #111827);
+  line-height: 1.2;
+}
+
+.contraintes-stat-card span {
+  font-size: 0.85rem;
+  color: var(--text-muted, #6b7280);
+}
+
+.contraintes-page__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--surface-card, #ffffff);
+  padding: 12px 18px;
+  border-radius: var(--radius-lg, 12px);
+  border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
+}
+
+.contraintes-page__tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.contraintes-page__tab {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-secondary, #4b5563);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.contraintes-page__tab:hover {
+  background: var(--surface-subtle, #f3f4f6);
+  color: var(--text-primary, #111827);
+}
+
+.contraintes-page__tab.is-active {
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.contraintes-page__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.contraintes-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 18px;
+}

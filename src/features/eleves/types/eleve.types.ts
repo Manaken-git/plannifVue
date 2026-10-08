@@ -3,4 +3,6 @@ export interface Eleve {
   nom: string;
   prenom: string;
   classeId?: number;
+  groupeNom?: string;
+  options?: string[];
 }

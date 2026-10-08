@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ClassesPage } from '../features/classes/pages/ClassesPage/ClassesPage';
 import { ConfigsPage } from '../features/configs/pages/ConfigsPage/ConfigsPage';
+import { ContraintesPage } from '../features/contraintes/pages/ContraintesPage/ContraintesPage';
 import { CreneauxPage } from '../features/creneaux/pages/CreneauxPage/CreneauxPage';
 import { ElevesPage } from '../features/eleves/pages/ElevesPage/ElevesPage';
 import { MatieresPage } from '../features/matieres/pages/MatieresPage/MatieresPage';
@@ -42,6 +43,8 @@ export function App() {
         return <SallesPage />;
       case 'configs':
         return <ConfigsPage />;
+      case 'contraintes':
+        return <ContraintesPage />;
       case 'vacances':
         return <VacancesPage />;
     }

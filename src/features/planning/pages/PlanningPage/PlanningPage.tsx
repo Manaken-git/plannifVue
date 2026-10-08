@@ -104,7 +104,7 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
   return (
     <div className="planning-page">
       <PageHeader title="Planning de la semaine" description="Visualisez, filtrez et organisez les séances de cours." createLabel="Nouvelle séance" loading={loading} onCreate={create} onRefresh={load} onImport={importCsv} onExport={exportCsv} />
-      <PlanningStats sessions={sourceSessions} professors={professeurs} classes={classes} subjects={matieres} onSelect={focusFromStats} />
+      <PlanningStats sessions={sourceSessions} professors={professeurs} classes={classes} subjects={matieres} salles={salles} onSelect={focusFromStats} />
       <CalendarGrid seances={filteredSessions} professeurs={professeurs} classes={classes} matieres={matieres} salles={salles} plannings={plannings} selectedPlanningId={selectedPlanningId} onPlanningChange={onSelectedPlanningChange} filter={filter} onFilterChange={setFilter} onEdit={edit} onCreate={create} focusDate={focusDate} />
       <footer className="planning-page__footer"><div><button type="button" onClick={() => setFilter({ type:'professeur', value:'' })}>Professeurs ({professeurs.length})</button><button type="button" onClick={() => setFilter({ type:'classe', value:'' })}>Classes ({classes.length})</button><button type="button" onClick={() => setFilter({ type:'matiere', value:'' })}>Matières ({matieres.length})</button></div><span>Les séances sont affichées en heure locale de l’établissement.</span></footer>
       <SessionForm open={open} mode={mode} item={editing} professeurs={professeurs} classes={classes} matieres={matieres} salles={salles} loading={loading} onClose={() => setOpen(false)} onSave={save} onDelete={remove} />
