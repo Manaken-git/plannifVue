@@ -1,0 +1,1168 @@
+/* ========================================================================== */
+/* Google Calendar Format for Class Presences                                 */
+/* ========================================================================== */
+
+.google-agenda {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface, rgba(16, 25, 42, 0.72));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-default, rgba(166, 183, 207, 0.14));
+  border-radius: var(--radius-lg, 17px);
+  overflow: hidden;
+  box-shadow: var(--shadow-md, 0 16px 42px rgba(0, 0, 0, 0.22));
+  min-height: 720px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Toolbar                                                                    */
+/* -------------------------------------------------------------------------- */
+
+.google-agenda__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--bg-surface-raised, rgba(20, 31, 51, 0.78));
+  border-bottom: 1px solid var(--border-default, rgba(166, 183, 207, 0.14));
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.google-agenda__toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.google-agenda__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 6px;
+}
+
+.google-agenda__calendar-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #4285F4 0%, #1a73e8 100%);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(66, 133, 244, 0.35);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.google-agenda__icon-month {
+  font-size: 0.58rem;
+  letter-spacing: 0.5px;
+  opacity: 0.9;
+  text-transform: uppercase;
+}
+
+.google-agenda__icon-day {
+  font-size: 1.05rem;
+}
+
+.google-agenda__logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.google-agenda__logo-text strong {
+  font-size: 1rem;
+  color: var(--text-primary, #f3f7fd);
+  letter-spacing: -0.2px;
+}
+
+.google-agenda__logo-text small {
+  font-size: 0.72rem;
+  color: var(--text-muted, #7a899f);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.google-agenda__today-btn {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm, 9px);
+  border: 1px solid var(--border-default, rgba(166, 183, 207, 0.14));
+  background: var(--bg-surface, rgba(16, 25, 42, 0.72));
+  color: var(--text-primary, #f3f7fd);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition, 160ms ease);
+}
+
+.google-agenda__today-btn:hover {
+  background: var(--bg-hover, rgba(31, 45, 71, 0.58));
+  border-color: var(--primary, #7477f5);
+}
+
+.google-agenda__nav-arrows {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.google-agenda__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary, #f3f7fd);
+  text-transform: capitalize;
+  letter-spacing: -0.3px;
+  margin-left: 6px;
+}
+
+.google-agenda__toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.google-agenda__view-switcher {
+  display: flex;
+  background: var(--bg-input, rgba(7, 15, 27, 0.66));
+  border: 1px solid var(--border-default, rgba(166, 183, 207, 0.14));
+  border-radius: var(--radius-sm, 9px);
+  padding: 3px;
+  gap: 2px;
+}
+
+.google-agenda__view-btn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #b5c0d0);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition, 160ms ease);
+}
+
+.google-agenda__view-btn:hover {
+  color: var(--text-primary, #f3f7fd);
+}
+
+.google-agenda__view-btn.is-active {
+  background: var(--primary, #7477f5);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(116, 119, 245, 0.35);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Container layout                                                           */
+/* -------------------------------------------------------------------------- */
+
+.google-agenda__container {
+  display: flex;
+  flex: 1;
+  min-height: 640px;
+  position: relative;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Sidebar                                                                    */
+/* -------------------------------------------------------------------------- */
+
+.google-agenda__sidebar {
+  width: 280px;
+  min-width: 280px;
+  background: var(--bg-surface-soft, rgba(12, 21, 36, 0.62));
+  border-right: 1px solid var(--border-default, rgba(166, 183, 207, 0.14));
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  overflow-y: auto;
+}
+
+.google-agenda__sidebar-create-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong, rgba(166, 183, 207, 0.23));
+  background: linear-gradient(135deg, rgba(66, 133, 244, 0.18), rgba(116, 119, 245, 0.22));
+  color: var(--text-primary, #f3f7fd);
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transition: all var(--transition, 160ms ease);
+}
+
+.google-agenda__sidebar-create-btn:hover {
+  background: linear-gradient(135deg, rgba(66, 133, 244, 0.28), rgba(116, 119, 245, 0.32));
+  border-color: var(--primary, #7477f5);
+  transform: translateY(-1px);
+}
+
+/* Mini Calendar */
+.google-agenda__minical {
+  background: var(--bg-input, rgba(7, 15, 27, 0.45));
+  border: 1px solid var(--border-subtle, rgba(166, 183, 207, 0.085));
+  border-radius: var(--radius-md, 13px);
+  padding: 12px;
+}
+
+.google-agenda__minical-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.google-agenda__minical-header strong {
+  font-size: 0.82rem;
+  text-transform: capitalize;
+  color: var(--text-primary, #f3f7fd);
+}
+
+.google-agenda__minical-nav {
+  display: flex;
+  gap: 2px;
+}
+
+.google-agenda__minical-nav button {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary, #b5c0d0);
+  cursor: pointer;
+  padding: 3px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.google-agenda__minical-nav button:hover {
+  background: var(--bg-hover, rgba(31, 45, 71, 0.58));
+  color: var(--text-primary, #f3f7fd);
+}
+
+.google-agenda__minical-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.google-agenda__minical-days-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.68rem;
+  color: var(--text-muted, #7a899f);
+  font-weight: 600;
+  padding-bottom: 4px;
+}
+
+.google-agenda__minical-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+}
+
+.google-agenda__minical-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary, #f3f7fd);
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: all var(--transition, 160ms ease);
+}
+
+.google-agenda__minical-cell:hover {
+  background: var(--bg-hover, rgba(31, 45, 71, 0.58));
+}
+
+.google-agenda__minical-cell.is-outside {
+  color: var(--text-faint, #56657a);
+  opacity: 0.45;
+}
+
+.google-agenda__minical-cell.is-today {
+  background: rgba(66, 133, 244, 0.25);
+  color: #93c5fd;
+  font-weight: 700;
+}
+
+.google-agenda__minical-cell.is-selected {
+  background: var(--primary, #7477f5);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* Quick Stats */
+.google-agenda__quick-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm, 9px);
+  background: var(--bg-input, rgba(7, 15, 27, 0.35));
+  border: 1px solid var(--border-subtle, rgba(166, 183, 207, 0.085));
+  font-size: 0.78rem;
+  color: var(--text-secondary, #b5c0d0);
+}
+
+.google-agenda__quick-stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.google-agenda__quick-stat-badge {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--text-faint, #56657a);
+}
+
+.google-agenda__quick-stat-badge.is-active {
+  background: var(--success, #45d5a3);
+  box-shadow: 0 0 8px rgba(69, 213, 163, 0.6);
+}
+
+/* Classes Filter section */
+.google-agenda__classes-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.google-agenda__classes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.google-agenda__classes-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted, #7a899f);
+}
+
+.google-agenda__classes-quick-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.google-agenda__classes-quick-actions button {
+  background: transparent;
+  border: none;
+  font-size: 0.72rem;
+  color: var(--primary, #7477f5);
+  cursor: pointer;
+  padding: 0;
+}
+
+.google-agenda__classes-quick-actions button:hover {
+  text-decoration: underline;
+}
+
+.google-agenda__classes-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--bg-input, rgba(7, 15, 27, 0.66));
+  border: 1px solid var(--border-default, rgba(166, 183, 207, 0.14));
+  border-radius: var(--radius-sm, 9px);
+  color: var(--text-muted, #7a899f);
+}
+
+.google-agenda__classes-search input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary, #f3f7fd);
+  font-size: 0.8rem;
+  width: 100%;
+}
+
+.google-agenda__classes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.google-agenda__class-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background var(--transition, 160ms ease);
+}
+
+.google-agenda__class-item:hover {
+  background: var(--bg-hover, rgba(31, 45, 71, 0.58));
+}
+
+.google-agenda__class-item input[type="checkbox"] {
+  display: none;
+}
+
+.google-agenda__checkbox-custom {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 2px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition, 160ms ease);
+}
+
+.google-agenda__check-mark {
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.google-agenda__class-label {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.google-agenda__class-name {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-primary, #f3f7fd);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.google-agenda__class-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  color: var(--text-muted, #7a899f);
+}
+
+.google-agenda__present-pill {
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: rgba(69, 213, 163, 0.15);
+  color: var(--success, #45d5a3);
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Main View Area                                                             */
+/* -------------------------------------------------------------------------- */
+
+.google-agenda__view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* ========================================================================== */
+/* 1. MONTH VIEW (Vue Mois)                                                   */
+/* ========================================================================== */
+
+.google-agenda__month-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+}
+
+.google-agenda__month-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: var(--bg-surface-raised, rgba(20, 31, 51, 0.78));
+  border-bottom: 1px solid var(--border-default, rgba(166, 183, 207, 0.14));
+}
+
+.google-agenda__month-header-cell {
+  padding: 10px 8px;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: var(--text-muted, #7a899f);
+  border-right: 1px solid var(--border-subtle, rgba(166, 183, 207, 0.085));
+}
+
+.google-agenda__month-header-cell:last-child {
+  border-right: none;
+}
+
+.google-agenda__month-weeks {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.google-agenda__month-week-row {
+  flex: 1;
+  min-height: 110px;
+  position: relative;
+  display: flex;
+  border-bottom: 1px solid var(--border-subtle, rgba(166, 183, 207, 0.085));
+}
+
+.google-agenda__month-week-row:last-child {
+  border-bottom: none;
+}
+
+.google-agenda__month-week-cells {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.google-agenda__month-cell {
+  border-right: 1px solid var(--border-subtle, rgba(166, 183, 207, 0.085));
+  padding: 6px 8px;
+  cursor: pointer;
+  transition: background var(--transition, 160ms ease);
+}
+
+.google-agenda__month-cell:hover {
+  background: rgba(116, 119, 245, 0.04);
+}
+
+.google-agenda__month-cell:last-child {
+  border-right: none;
+}
+
+.google-agenda__month-cell.is-outside {
+  background: rgba(5, 10, 19, 0.35);
+  opacity: 0.45;
+}
+
+.google-agenda__month-cell-header {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.google-agenda__day-number {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary, #b5c0d0);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+}
+
+.google-agenda__day-number.is-today-badge {
+  background: var(--primary, #7477f5);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(116, 119, 245, 0.45);
+}
+
+/* Event bars overlay in month view */
+.google-agenda__month-week-events {
+  position: relative;
+  width: 100%;
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: 24px;
+  gap: 3px 0;
+  padding: 0 4px 6px;
+  pointer-events: none;
+}
+
+.google-agenda__event-bar {
+  pointer-events: auto;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  border: 1px solid;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  z-index: 2;
+  transition: all var(--transition, 160ms ease);
+  border-radius: 0;
+  margin: 0 1px;
+}
+
+.google-agenda__event-bar.is-start {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+  margin-left: 2px;
+}
+
+.google-agenda__event-bar.is-end {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+  margin-right: 2px;
+}
+
+.google-agenda__event-bar:hover {
+  filter: brightness(1.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 5;
+}
+
+.google-agenda__event-bar-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.google-agenda__event-bar-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.google-agenda__event-bar-dates {
+  font-size: 0.68rem;
+  opacity: 0.75;
+  font-weight: normal;
+}
+
+/* ========================================================================== */
+/* 2. WEEK VIEW (Vue Semaine)                                                 */
+/* ========================================================================== */
+
+.google-agenda__week-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.google-agenda__week-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: var(--bg-surface-raised, rgba(20, 31, 51, 0.78));
+  border-bottom: 1px solid var(--border-default, rgba(166, 183, 207, 0.14));
+}
+
+.google-agenda__week-header-cell {
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border-right: 1px solid var(--border-subtle, rgba(166, 183, 207, 0.085));
+}
+
+.google-agenda__week-header-cell:last-child {
+  border-right: none;
+}
+
+.google-agenda__week-header-cell.is-today {
+  background: rgba(116, 119, 245, 0.06);
+}
+
+.google-agenda__week-header-name {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text-muted, #7a899f);
+}
+
+.google-agenda__week-header-num {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary, #f3f7fd);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+}
+
+.google-agenda__week-header-num.is-today {
+  background: var(--primary, #7477f5);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(116, 119, 245, 0.45);
+}
+
+/* All-day multi-day banner */
+.google-agenda__week-all-day-row {
+  display: flex;
+  border-bottom: 1px solid var(--border-default, rgba(166, 183, 207, 0.14));
+  background: var(--bg-surface-soft, rgba(12, 21, 36, 0.4));
+  padding: 6px 0;
+}
+
+.google-agenda__week-all-day-label {
+  width: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: var(--text-muted, #7a899f);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.google-agenda__week-all-day-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: 24px;
+  gap: 4px 0;
+  padding-right: 8px;
+}
+
+.google-agenda__event-bar.is-week-bar {
+  margin: 0 2px;
+}
+
+/* Columns for each day */
+.google-agenda__week-columns {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  flex: 1;
+}
+
+.google-agenda__week-col {
+  border-right: 1px solid var(--border-subtle, rgba(166, 183, 207, 0.085));
+  display: flex;
+  flex-direction: column;
+}
+
+.google-agenda__week-col:last-child {
+  border-right: none;
+}
+
+.google-agenda__week-col.is-today {
+  background: rgba(116, 119, 245, 0.03);
+}
+
+.google-agenda__week-col-header {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-subtle, rgba(166, 183, 207, 0.085));
+  display: flex;
+  justify-content: space-between;
+}
+
+.google-agenda__week-col-count {
+  font-size: 0.72rem;
+  color: var(--text-muted, #7a899f);
+}
+
+.google-agenda__week-col-content {
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.google-agenda__week-empty {
+  padding: 16px 8px;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-faint, #56657a);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.google-agenda__week-add-link {
+  background: transparent;
+  border: none;
+  font-size: 0.72rem;
+  color: var(--primary, #7477f5);
+  cursor: pointer;
+  padding: 0;
+}
+
+.google-agenda__week-add-link:hover {
+  text-decoration: underline;
+}
+
+.google-agenda__week-class-card {
+  border-radius: var(--radius-sm, 9px);
+  padding: 10px 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: all var(--transition, 160ms ease);
+}
+
+.google-agenda__week-class-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+  filter: brightness(1.15);
+}
+
+.google-agenda__week-card-top strong {
+  font-size: 0.85rem;
+  color: var(--text-primary, #f3f7fd);
+}
+
+.google-agenda__week-card-info {
+  font-size: 0.72rem;
+  color: var(--text-secondary, #b5c0d0);
+  margin-top: 4px;
+}
+
+.google-agenda__week-card-sessions {
+  font-size: 0.7rem;
+  color: var(--primary, #7477f5);
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+/* ========================================================================== */
+/* 3. SCHEDULE / AGENDA VIEW (Vue Planning Liste)                             */
+/* ========================================================================== */
+
+.google-agenda__schedule-view {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.google-agenda__schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.google-agenda__schedule-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--bg-surface-raised, rgba(20, 31, 51, 0.78));
+  border: 1px solid var(--border-default, rgba(166, 183, 207, 0.14));
+  border-radius: var(--radius-md, 13px);
+  cursor: pointer;
+  transition: all var(--transition, 160ms ease);
+  gap: 20px;
+}
+
+.google-agenda__schedule-card:hover {
+  background: var(--bg-hover, rgba(31, 45, 71, 0.58));
+  transform: translateX(4px);
+}
+
+.google-agenda__schedule-date-col {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 220px;
+}
+
+.google-agenda__schedule-day {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary, #f3f7fd);
+}
+
+.google-agenda__schedule-arrow {
+  color: var(--text-muted, #7a899f);
+  font-size: 0.8rem;
+}
+
+.google-agenda__schedule-info-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.google-agenda__schedule-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.google-agenda__schedule-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.google-agenda__schedule-title-row strong {
+  font-size: 0.95rem;
+  color: var(--text-primary, #f3f7fd);
+}
+
+.google-agenda__schedule-meta-row {
+  display: flex;
+  gap: 8px;
+  font-size: 0.76rem;
+  color: var(--text-muted, #7a899f);
+}
+
+.google-agenda__badge-status {
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+.google-agenda__badge-status.is-current {
+  background: rgba(69, 213, 163, 0.15);
+  color: var(--success, #45d5a3);
+}
+
+.google-agenda__badge-status.is-upcoming {
+  background: rgba(69, 197, 245, 0.15);
+  color: var(--accent-cyan, #45c5f5);
+}
+
+.google-agenda__badge-status.is-past {
+  background: rgba(122, 137, 159, 0.15);
+  color: var(--text-muted, #7a899f);
+}
+
+.google-agenda__empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  gap: 12px;
+  color: var(--text-muted, #7a899f);
+}
+
+.google-agenda__empty-state h3 {
+  margin: 0;
+  color: var(--text-primary, #f3f7fd);
+  font-size: 1.15rem;
+}
+
+.google-agenda__empty-state p {
+  margin: 0;
+  font-size: 0.88rem;
+  max-width: 440px;
+}
+
+/* ========================================================================== */
+/* 4. YEAR VIEW (Vue Année)                                                   */
+/* ========================================================================== */
+
+.google-agenda__year-view {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.google-agenda__year-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.google-agenda__year-month-card {
+  background: var(--bg-surface-raised, rgba(20, 31, 51, 0.78));
+  border: 1px solid var(--border-default, rgba(166, 183, 207, 0.14));
+  border-radius: var(--radius-md, 13px);
+  padding: 14px;
+  cursor: pointer;
+  transition: all var(--transition, 160ms ease);
+}
+
+.google-agenda__year-month-card:hover {
+  background: var(--bg-hover, rgba(31, 45, 71, 0.58));
+  border-color: var(--primary, #7477f5);
+  transform: translateY(-2px);
+}
+
+.google-agenda__year-month-title {
+  margin: 0 0 10px 0;
+  font-size: 0.95rem;
+  text-transform: capitalize;
+  color: var(--text-primary, #f3f7fd);
+}
+
+.google-agenda__year-mini-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.google-agenda__year-mini-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.65rem;
+  color: var(--text-muted, #7a899f);
+  font-weight: 600;
+  padding-bottom: 2px;
+}
+
+.google-agenda__year-mini-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.google-agenda__year-mini-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  border-radius: 4px;
+  color: var(--text-secondary, #b5c0d0);
+  border: 1px solid transparent;
+}
+
+.google-agenda__year-mini-cell.is-outside {
+  opacity: 0.25;
+}
+
+.google-agenda__year-mini-cell.is-today {
+  font-weight: 700;
+  color: var(--primary, #7477f5);
+}
+
+.google-agenda__year-mini-cell.has-presence {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* ========================================================================== */
+/* Detail modal inside Google Calendar                                        */
+/* ========================================================================== */
+
+.google-event-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.google-event-detail__header {
+  padding: 16px 18px;
+  border-radius: var(--radius-sm, 9px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.google-event-detail__badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.google-event-detail__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.google-event-detail__type {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--text-muted, #7a899f);
+}
+
+.google-event-detail__title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary, #f3f7fd);
+}
+
+.google-event-detail__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 4px;
+}
+
+.google-event-detail__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.google-event-detail__icon {
+  color: var(--text-muted, #7a899f);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.google-event-detail__label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted, #7a899f);
+  margin-bottom: 2px;
+}
+
+.google-event-detail__value {
+  font-size: 0.92rem;
+  color: var(--text-primary, #f3f7fd);
+}
+
+.google-event-detail__subvalue {
+  font-size: 0.82rem;
+  color: var(--text-secondary, #b5c0d0);
+  margin-top: 2px;
+}
+
+.google-event-detail__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-default, rgba(166, 183, 207, 0.14));
+}
+
+.google-event-detail__footer-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

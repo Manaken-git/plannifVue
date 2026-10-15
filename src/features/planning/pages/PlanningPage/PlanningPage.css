@@ -11,6 +11,53 @@
   flex: 1;
 }
 
+.planning-view-switcher {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-surface-raised, rgba(20, 31, 51, 0.78));
+  border: 1px solid var(--border-default, rgba(166, 183, 207, 0.14));
+  border-radius: var(--radius-md, 13px);
+  padding: 4px;
+  width: fit-content;
+  box-shadow: var(--shadow-xs, 0 1px 2px rgba(0, 0, 0, 0.20));
+}
+
+.planning-view-switcher__btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm, 9px);
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #b5c0d0);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition, 160ms ease);
+}
+
+.planning-view-switcher__btn:hover {
+  color: var(--text-primary, #f3f7fd);
+  background: var(--bg-hover, rgba(31, 45, 71, 0.58));
+}
+
+.planning-view-switcher__btn.is-active {
+  background: var(--primary, #7477f5);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(116, 119, 245, 0.38);
+}
+
+.planning-view-switcher__badge {
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  background: rgba(255, 255, 255, 0.18);
+  color: inherit;
+}
+
 .planning-unplanned-banner {
   display: flex;
   align-items: center;

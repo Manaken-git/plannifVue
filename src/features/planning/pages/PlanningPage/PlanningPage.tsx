@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, BookmarkCheck, Eye } from 'lucide-react';
+import { AlertTriangle, BookmarkCheck, CalendarDays, Clock, Eye } from 'lucide-react';
 import { useToast } from '../../../../app/providers/useToast';
 import { Button } from '../../../../shared/ui/Button/Button';
 import { Modal } from '../../../../shared/ui/Modal/Modal';
@@ -17,6 +17,7 @@ import { sallesApi } from '../../../salles/api/salles.api';
 import type { Salle } from '../../../salles/types/salle.types';
 import { planningApi } from '../../api/planning.api';
 import { CalendarGrid } from '../../components/CalendarGrid/CalendarGrid';
+import { ClassesPresenceAgenda } from '../../components/ClassesPresenceAgenda';
 import { PlanningStats } from '../../components/PlanningStats/PlanningStats';
 import { SessionForm } from '../../components/SessionForm/SessionForm';
 import type { CalendarFilter, Seance, SessionAssociations } from '../../types/planning.types';
@@ -41,6 +42,7 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
   const [mode, setMode] = useState<'create' | 'edit'>('create');
   const [editing, setEditing] = useState<Seance | null>(null);
   const [focusDate, setFocusDate] = useState<string>();
+  const [homeView, setHomeView] = useState<'schedule' | 'presence'>('schedule');
 
   // Modals for unplanned sessions and planning saving
   const [unplannedModalOpen, setUnplannedModalOpen] = useState(false);
@@ -251,13 +253,32 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
     notify('Élément sélectionné et affiché dans le planning.');
   };
 
+  const handleViewScheduleForClass = (classeNom: string) => {
+    setFilter({ type: 'classe', value: classeNom });
+    setHomeView('schedule');
+    const session = sourceSessions.find((s) => s.classeNom === classeNom);
+    if (session) {
+      setFocusDate(session.debut);
+    }
+    notify(`Affichage de l'emploi du temps pour la classe ${classeNom}`);
+  };
+
   const unplannedCount = selectedPlanning?.seancesNonPlanifiees?.length ?? 0;
+
+  const classesWithPresencesCount = useMemo(
+    () => classes.filter((c) => (c.presences ?? []).some((p) => p.dateDebut && p.dateFin)).length,
+    [classes]
+  );
 
   return (
     <div className="planning-page">
       <PageHeader
-        title="Planning de la semaine"
-        description="Visualisez, filtrez et organisez les séances de cours."
+        title={homeView === 'presence' ? "Présence des classes (Google Agenda)" : "Planning de la semaine"}
+        description={
+          homeView === 'presence'
+            ? "Visualisez, filtrez et organisez les périodes de présence des promotions au format Google Agenda."
+            : "Visualisez, filtrez et organisez les séances de cours."
+        }
         createLabel="Nouvelle séance"
         loading={loading}
         onCreate={create}
@@ -265,75 +286,114 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
         onImport={importCsv}
         onExport={exportCsv}
         extraActions={
-          <Button
-            variant="secondary"
-            disabled={loading || sourceSessions.length === 0}
-            onClick={handleOpenSaveModal}
-            icon={<BookmarkCheck size={14} />}
-            title="Enregistrer les séances affichées sous un nom de planning"
-          >
-            Sauvegarder en planning
-          </Button>
+          homeView === 'schedule' ? (
+            <Button
+              variant="secondary"
+              disabled={loading || sourceSessions.length === 0}
+              onClick={handleOpenSaveModal}
+              icon={<BookmarkCheck size={14} />}
+              title="Enregistrer les séances affichées sous un nom de planning"
+            >
+              Sauvegarder en planning
+            </Button>
+          ) : undefined
         }
       />
 
-      {unplannedCount > 0 && (
-        <div className="planning-unplanned-banner">
-          <div className="planning-unplanned-banner__content">
-            <AlertTriangle size={18} className="planning-unplanned-banner__icon" />
-            <span>
-              <strong>{unplannedCount} séance{unplannedCount > 1 ? 's' : ''} non planifiée{unplannedCount > 1 ? 's' : ''}</strong> dans ce planning en raison de données manquantes (professeur, salle, créneau).
-            </span>
-          </div>
-          <Button
-            variant="secondary"
-            onClick={() => setUnplannedModalOpen(true)}
-            icon={<Eye size={14} />}
-          >
-            Voir les séances non planifiées ({unplannedCount})
-          </Button>
-        </div>
+      {/* Main Home Switcher */}
+      <div className="planning-view-switcher" role="tablist" aria-label="Mode d'affichage d'accueil">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={homeView === 'schedule'}
+          className={`planning-view-switcher__btn${homeView === 'schedule' ? ' is-active' : ''}`}
+          onClick={() => setHomeView('schedule')}
+        >
+          <Clock size={16} />
+          <span>Emploi du temps (Séances)</span>
+          <span className="planning-view-switcher__badge">{filteredSessions.length}</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={homeView === 'presence'}
+          className={`planning-view-switcher__btn${homeView === 'presence' ? ' is-active' : ''}`}
+          onClick={() => setHomeView('presence')}
+        >
+          <CalendarDays size={16} />
+          <span>Présence des classes (Google Agenda)</span>
+          <span className="planning-view-switcher__badge">{classesWithPresencesCount} classes</span>
+        </button>
+      </div>
+
+      {homeView === 'presence' ? (
+        <ClassesPresenceAgenda
+          classes={classes}
+          seances={sourceSessions}
+          onRefreshClasses={load}
+          onViewScheduleForClass={handleViewScheduleForClass}
+        />
+      ) : (
+        <>
+          {unplannedCount > 0 && (
+            <div className="planning-unplanned-banner">
+              <div className="planning-unplanned-banner__content">
+                <AlertTriangle size={18} className="planning-unplanned-banner__icon" />
+                <span>
+                  <strong>{unplannedCount} séance{unplannedCount > 1 ? 's' : ''} non planifiée{unplannedCount > 1 ? 's' : ''}</strong> dans ce planning en raison de données manquantes (professeur, salle, créneau).
+                </span>
+              </div>
+              <Button
+                variant="secondary"
+                onClick={() => setUnplannedModalOpen(true)}
+                icon={<Eye size={14} />}
+              >
+                Voir les séances non planifiées ({unplannedCount})
+              </Button>
+            </div>
+          )}
+
+          <PlanningStats
+            sessions={sourceSessions}
+            professors={professeurs}
+            classes={classes}
+            subjects={matieres}
+            salles={salles}
+            onSelect={focusFromStats}
+          />
+
+          <CalendarGrid
+            seances={filteredSessions}
+            professeurs={professeurs}
+            classes={classes}
+            matieres={matieres}
+            salles={salles}
+            plannings={plannings}
+            selectedPlanningId={selectedPlanningId}
+            onPlanningChange={onSelectedPlanningChange}
+            filter={filter}
+            onFilterChange={setFilter}
+            onEdit={edit}
+            onCreate={create}
+            focusDate={focusDate}
+          />
+
+          <footer className="planning-page__footer">
+            <div>
+              <button type="button" onClick={() => setFilter({ type: 'professeur', value: '' })}>
+                Professeurs ({professeurs.length})
+              </button>
+              <button type="button" onClick={() => setFilter({ type: 'classe', value: '' })}>
+                Classes ({classes.length})
+              </button>
+              <button type="button" onClick={() => setFilter({ type: 'matiere', value: '' })}>
+                Matières ({matieres.length})
+              </button>
+            </div>
+            <span>Les séances sont affichées en heure locale de l’établissement.</span>
+          </footer>
+        </>
       )}
-
-      <PlanningStats
-        sessions={sourceSessions}
-        professors={professeurs}
-        classes={classes}
-        subjects={matieres}
-        salles={salles}
-        onSelect={focusFromStats}
-      />
-
-      <CalendarGrid
-        seances={filteredSessions}
-        professeurs={professeurs}
-        classes={classes}
-        matieres={matieres}
-        salles={salles}
-        plannings={plannings}
-        selectedPlanningId={selectedPlanningId}
-        onPlanningChange={onSelectedPlanningChange}
-        filter={filter}
-        onFilterChange={setFilter}
-        onEdit={edit}
-        onCreate={create}
-        focusDate={focusDate}
-      />
-
-      <footer className="planning-page__footer">
-        <div>
-          <button type="button" onClick={() => setFilter({ type: 'professeur', value: '' })}>
-            Professeurs ({professeurs.length})
-          </button>
-          <button type="button" onClick={() => setFilter({ type: 'classe', value: '' })}>
-            Classes ({classes.length})
-          </button>
-          <button type="button" onClick={() => setFilter({ type: 'matiere', value: '' })}>
-            Matières ({matieres.length})
-          </button>
-        </div>
-        <span>Les séances sont affichées en heure locale de l’établissement.</span>
-      </footer>
 
       <SessionForm
         open={open}
