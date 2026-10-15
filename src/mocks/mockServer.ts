@@ -4,7 +4,7 @@ import type { Creneau } from '../features/creneaux/types/creneau.types';
 import type { Eleve } from '../features/eleves/types/eleve.types';
 import type { Matiere } from '../features/matieres/types/matiere.types';
 import type { Seance } from '../features/planning/types/planning.types';
-import type { PlanningDTO, PlanningSaveDTO } from '../features/plannings/types/planning-saved.types';
+import type { PlanningDTO, PlanningSaveDTO, SeanceNonPlanifieeDTO } from '../features/plannings/types/planning-saved.types';
 import type { Professeur } from '../features/professeurs/types/professeur.types';
 import type { Salle } from '../features/salles/types/salle.types';
 import type { Vacances } from '../features/vacances/types/vacances.types';
@@ -98,6 +98,51 @@ async function getDatabase(): Promise<MockDatabase> {
       }
 
       const initial = clone(seed);
+      if (!initial.plannings || initial.plannings.length === 0) {
+        initial.plannings = [
+          {
+            id: 1,
+            nom: 'Planning Principal - S42',
+            dateCreation: new Date().toISOString(),
+            seances: (initial.seances ?? []).slice(0, 16).map((s) => enrichSession(initial, s)),
+            seancesNonPlanifiees: [
+              {
+                id: 901,
+                classeNom: 'Terminale Générale 1',
+                matiereNom: 'Philosophie',
+                professeurNomComplet: null,
+                salleCode: 'A101',
+                type: 'COURS',
+                debut: '2026-10-19T08:00:00',
+                fin: '2026-10-19T10:00:00',
+                motifEchec: 'PROFESSEUR_MANQUANT',
+              },
+              {
+                id: 902,
+                classeNom: 'Première STI2D',
+                matiereNom: 'Physique-Chimie',
+                professeurNomComplet: 'Jean Dupont',
+                salleCode: null,
+                type: 'TP',
+                debut: '2026-10-20T14:00:00',
+                fin: '2026-10-20T15:30:00',
+                motifEchec: 'SALLE_MANQUANTE',
+              },
+              {
+                id: 903,
+                classeNom: 'Seconde 3',
+                matiereNom: 'Mathématiques',
+                professeurNomComplet: null,
+                salleCode: null,
+                type: 'COURS',
+                debut: null,
+                fin: null,
+                motifEchec: 'PROFESSEUR_MANQUANT, SALLE_MANQUANTE, CRENEAU_DEBUT_MANQUANT',
+              },
+            ],
+          },
+        ];
+      }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
       return initial;
     })();
@@ -153,6 +198,7 @@ function enrichPlanning(database: MockDatabase, planning: PlanningDTO): Planning
   return {
     ...planning,
     seances: (planning.seances ?? []).map((item) => enrichSession(database, item as MockSeance)),
+    seancesNonPlanifiees: planning.seancesNonPlanifiees ?? [],
   };
 }
 
@@ -249,19 +295,73 @@ function getRoute(path: string) {
 }
 
 async function savePlanning(database: MockDatabase, payload: PlanningSaveDTO) {
-  const sourceSessions = payload.seances
-    .map((session) => database.seances.find((item) => item.id === session.id))
-    .filter((item): item is MockSeance => Boolean(item))
-    .map((item) => enrichSession(database, item));
+  const validSessions: Seance[] = [];
+  const unplannedSessions: SeanceNonPlanifieeDTO[] = [];
 
-  const id = payload.id ?? nextId(database.plannings);
+  for (const session of payload.seances ?? []) {
+    const existing = session.id ? database.seances.find((item) => item.id === session.id) : undefined;
+    const profId = session.professeurId ?? existing?.professeurId;
+    const classeId = session.classeId ?? existing?.classeId;
+    const matiereId = session.matiereId ?? existing?.matiereId;
+    const salleId = session.salleId ?? existing?.salleId;
+    const debut = session.debut ?? existing?.debut;
+    const fin = session.fin ?? existing?.fin;
+    const type = session.type ?? existing?.type;
+    const groupe = session.groupe ?? existing?.groupe;
+    const alignementCode = session.alignementCode ?? existing?.alignementCode;
+
+    const motifs: string[] = [];
+    if (!profId) motifs.push('PROFESSEUR_MANQUANT');
+    if (!salleId) motifs.push('SALLE_MANQUANTE');
+    if (!debut) motifs.push('CRENEAU_DEBUT_MANQUANT');
+    if (!classeId) motifs.push('CLASSE_MANQUANTE');
+    if (!matiereId) motifs.push('MATIERE_MANQUANTE');
+
+    const prof = database.professeurs.find((p) => p.id === profId);
+    const classe = database.classes.find((c) => c.id === classeId);
+    const matiere = database.matieres.find((m) => m.id === matiereId);
+    const salle = database.salles.find((s) => s.id === salleId);
+
+    if (motifs.length === 0) {
+      validSessions.push({
+        id: session.id ?? nextId(database.seances),
+        debut: debut!,
+        fin: fin ?? debut!,
+        professeurNomComplet: prof ? `${prof.prenom} ${prof.nom}` : undefined,
+        classeNom: classe?.nom,
+        matiereNom: matiere?.nom,
+        salleCode: salle?.code,
+        type,
+        groupe,
+        alignementCode,
+      });
+    } else {
+      unplannedSessions.push({
+        id: session.id,
+        debut,
+        fin,
+        professeurNomComplet: prof ? `${prof.prenom} ${prof.nom}` : null,
+        classeNom: classe?.nom ?? null,
+        matiereNom: matiere?.nom ?? null,
+        salleCode: salle?.code ?? null,
+        type: type ?? null,
+        groupe: groupe ?? null,
+        alignementCode: alignementCode ?? null,
+        motifEchec: motifs.join(', '),
+      });
+    }
+  }
+
+  const id = payload.id ?? nextId(database.plannings ?? []);
   const planning: PlanningDTO = {
     id,
     nom: payload.nom,
     dateCreation: payload.dateCreation ?? new Date().toISOString(),
-    seances: sourceSessions,
+    seances: validSessions,
+    seancesNonPlanifiees: unplannedSessions,
   };
 
+  database.plannings = database.plannings ?? [];
   const existing = database.plannings.findIndex((item) => item.id === id);
   if (existing >= 0) database.plannings[existing] = planning;
   else database.plannings.push(planning);
@@ -307,7 +407,14 @@ export async function mockRequest<T>(path: string, init?: RequestInit): Promise<
       deleteItem(database, 'plannings', Number(idSegment));
       return undefined as T;
     }
+    if (action && /^\d+$/.test(action) && idSegment === 'seances-non-planifiees' && method === 'GET') {
+      database.plannings = database.plannings ?? [];
+      const planning = database.plannings.find((item) => item.id === Number(action));
+      if (!planning) throw new Error(`Planning #${action} introuvable.`);
+      return clone(planning.seancesNonPlanifiees ?? []) as T;
+    }
     if (action && /^\d+$/.test(action) && method === 'GET') {
+      database.plannings = database.plannings ?? [];
       const planning = database.plannings.find((item) => item.id === Number(action));
       if (!planning) throw new Error(`Planning #${action} introuvable.`);
       return enrichPlanning(database, planning) as T;

@@ -10,7 +10,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     setToasts((current) => current.filter((toast) => toast.id !== id));
   }, []);
 
-  const notify = useCallback((message: string, type: 'success' | 'error' = 'success') => {
+  const notify = useCallback((message: string, type: 'success' | 'error' | 'warning' = 'success') => {
     const id = nextId.current++;
     setToasts((current) => [...current, { id, message, type }]);
     window.setTimeout(() => remove(id), 3800);

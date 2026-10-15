@@ -1,0 +1,122 @@
+.snp-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.snp-modal__banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: var(--text-color, #1e293b);
+}
+
+.snp-modal__banner-icon {
+  color: #ef4444;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.snp-modal__banner-text h4 {
+  margin: 0 0 4px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #dc2626;
+}
+
+.snp-modal__banner-text p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted, #64748b);
+  line-height: 1.4;
+}
+
+.snp-modal__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.snp-modal__stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  background: var(--surface-secondary, #f1f5f9);
+  color: var(--text-color, #334155);
+  border: 1px solid var(--border-color, #e2e8f0);
+}
+
+.snp-modal__stat-pill--danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.snp-modal__stat-pill--warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: #b45309;
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.snp-modal__search {
+  margin-bottom: 4px;
+}
+
+.snp-modal__table-container {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+}
+
+.snp-modal__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.snp-modal__table th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-secondary, #f8fafc);
+  padding: 10px 14px;
+  font-weight: 600;
+  color: var(--text-muted, #475569);
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  z-index: 1;
+}
+
+.snp-modal__table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color, #f1f5f9);
+  color: var(--text-color, #1e293b);
+  vertical-align: middle;
+}
+
+.snp-modal__table tr:last-child td {
+  border-bottom: none;
+}
+
+.snp-modal__table tr:hover {
+  background: rgba(241, 245, 249, 0.6);
+}
+
+.snp-modal__motifs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.snp-modal__missing-tag {
+  font-style: italic;
+  color: #94a3b8;
+  font-size: 0.8rem;
+}

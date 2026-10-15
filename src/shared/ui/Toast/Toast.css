@@ -26,3 +26,5 @@
 .toast--success > svg { color: var(--success); }
 .toast--error { border-color: rgba(251,113,133,.2); }
 .toast--error > svg { color: var(--danger); }
+.toast--warning { border-color: rgba(245,158,11,.25); }
+.toast--warning > svg { color: #f59e0b; }

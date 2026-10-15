@@ -1,12 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { AlertTriangle, BookmarkCheck, Eye } from 'lucide-react';
 import { useToast } from '../../../../app/providers/useToast';
+import { Button } from '../../../../shared/ui/Button/Button';
+import { Modal } from '../../../../shared/ui/Modal/Modal';
 import { PageHeader } from '../../../../shared/ui/PageHeader/PageHeader';
 import { classesApi } from '../../../classes/api/classes.api';
 import type { Classe } from '../../../classes/types/classe.types';
 import { matieresApi } from '../../../matieres/api/matieres.api';
 import type { Matiere } from '../../../matieres/types/matiere.types';
 import { planningsApi } from '../../../plannings/api/plannings.api';
-import type { PlanningDTO } from '../../../plannings/types/planning-saved.types';
+import { SeancesNonPlanifieesModal } from '../../../plannings/components/SeancesNonPlanifieesModal/SeancesNonPlanifieesModal';
+import type { PlanningDTO, PlanningSaveDTO } from '../../../plannings/types/planning-saved.types';
 import { professeursApi } from '../../../professeurs/api/professeurs.api';
 import type { Professeur } from '../../../professeurs/types/professeur.types';
 import { sallesApi } from '../../../salles/api/salles.api';
@@ -38,6 +42,11 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
   const [editing, setEditing] = useState<Seance | null>(null);
   const [focusDate, setFocusDate] = useState<string>();
 
+  // Modals for unplanned sessions and planning saving
+  const [unplannedModalOpen, setUnplannedModalOpen] = useState(false);
+  const [saveModalOpen, setSaveModalOpen] = useState(false);
+  const [planningSaveName, setPlanningSaveName] = useState('');
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -49,7 +58,12 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
         sallesApi.list().catch(() => []),
         planningsApi.list().catch(() => []),
       ]);
-      setSeances(sessions); setProfesseurs(professors); setClasses(classList); setMatieres(subjects); setSalles(rooms); setPlannings(savedPlannings);
+      setSeances(sessions);
+      setProfesseurs(professors);
+      setClasses(classList);
+      setMatieres(subjects);
+      setSalles(rooms);
+      setPlannings(savedPlannings);
     } catch (error) {
       notify(error instanceof Error ? error.message : 'Impossible de charger le planning.', 'error');
     } finally {
@@ -57,9 +71,20 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
     }
   }, [notify]);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    void load();
+  }, [load]);
 
-  const sourceSessions = useMemo(() => plannings.find((planning) => planning.id === selectedPlanningId)?.seances ?? seances, [plannings, seances, selectedPlanningId]);
+  const selectedPlanning = useMemo(
+    () => plannings.find((planning) => planning.id === selectedPlanningId),
+    [plannings, selectedPlanningId]
+  );
+
+  const sourceSessions = useMemo(
+    () => selectedPlanning?.seances ?? seances,
+    [selectedPlanning, seances]
+  );
+
   const filteredSessions = useMemo(() => sourceSessions.filter((seance) => {
     if (filter.type === 'all' || !filter.value) return true;
     if (filter.type === 'professeur') return seance.professeurNomComplet === filter.value;
@@ -72,9 +97,11 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
   const save = async (data: Seance, associations: SessionAssociations) => {
     setLoading(true);
     try {
-      if (mode === 'create') await planningApi.create(data, associations); else await planningApi.update(data, associations);
+      if (mode === 'create') await planningApi.create(data, associations);
+      else await planningApi.update(data, associations);
       notify(mode === 'create' ? 'Séance planifiée.' : 'Séance mise à jour.');
-      setOpen(false); await load();
+      setOpen(false);
+      await load();
     } catch (error) {
       notify(error instanceof Error ? error.message : "Erreur lors de l'enregistrement de la séance.", 'error');
       setLoading(false);
@@ -83,31 +110,286 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
 
   const remove = async (id: number) => {
     if (!window.confirm('Supprimer cette séance ?')) return;
-    try { await planningApi.remove(id); notify('Séance supprimée.'); setOpen(false); await load(); }
-    catch (error) { notify(error instanceof Error ? error.message : 'Suppression impossible.', 'error'); }
+    try {
+      await planningApi.remove(id);
+      notify('Séance supprimée.');
+      setOpen(false);
+      await load();
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'Suppression impossible.', 'error');
+    }
   };
 
-  const importCsv = async (file: File) => { try { await planningApi.importCsv(file); notify('Séances importées.'); await load(); } catch { notify("Échec de l'import CSV.", 'error'); } };
-  const exportCsv = async () => { try { await planningApi.exportCsv(); } catch { notify("Échec de l'export CSV.", 'error'); } };
-  const create = () => { setMode('create'); setEditing(null); setOpen(true); };
-  const edit = (seance: Seance) => { setMode('edit'); setEditing(seance); setOpen(true); };
+  const importCsv = async (file: File) => {
+    try {
+      await planningApi.importCsv(file);
+      notify('Séances importées.');
+      await load();
+    } catch {
+      notify("Échec de l'import CSV.", 'error');
+    }
+  };
+
+  const exportCsv = async () => {
+    try {
+      await planningApi.exportCsv();
+    } catch {
+      notify("Échec de l'export CSV.", 'error');
+    }
+  };
+
+  const create = () => {
+    setMode('create');
+    setEditing(null);
+    setOpen(true);
+  };
+
+  const edit = (seance: Seance) => {
+    setMode('edit');
+    setEditing(seance);
+    setOpen(true);
+  };
+
+  const handleOpenSaveModal = () => {
+    const defaultName = selectedPlanning
+      ? `${selectedPlanning.nom} (copie)`
+      : `Planning du ${new Date().toLocaleDateString('fr-FR')}`;
+    setPlanningSaveName(defaultName);
+    setSaveModalOpen(true);
+  };
+
+  const handleSavePlanning = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!planningSaveName.trim()) return;
+
+    setLoading(true);
+    try {
+      const payload: PlanningSaveDTO = {
+        nom: planningSaveName.trim(),
+        dateCreation: new Date().toISOString(),
+        seances: sourceSessions.map((s) => {
+          const prof = professeurs.find((p) =>
+            s.professeurNomComplet && (`${p.prenom} ${p.nom}` === s.professeurNomComplet || s.professeurNomComplet.includes(p.nom))
+          );
+          const classe = classes.find((c) => c.nom === s.classeNom);
+          const matiere = matieres.find((m) => m.nom === s.matiereNom);
+          const salle = salles.find((r) => r.code === s.salleCode);
+
+          return {
+            id: s.id,
+            professeurId: prof?.id,
+            classeId: classe?.id,
+            matiereId: matiere?.id,
+            salleId: salle?.id,
+            debut: s.debut,
+            fin: s.fin,
+            type: s.type || s.typeSeance,
+            groupe: s.groupe || s.groupeNom,
+            alignementCode: s.alignementCode || s.alignementId,
+          };
+        }),
+      };
+
+      const saved = await planningsApi.save(payload);
+      setSaveModalOpen(false);
+      await load();
+
+      if (saved?.id) {
+        onSelectedPlanningChange(saved.id);
+      }
+
+      const unplannedCount = saved?.seancesNonPlanifiees?.length ?? 0;
+      if (unplannedCount > 0) {
+        notify(
+          `Planning "${saved.nom}" sauvegardé : ${saved.seances?.length ?? 0} séances planifiées, ${unplannedCount} séance(s) non planifiée(s).`,
+          'warning'
+        );
+      } else {
+        notify(`Planning "${saved.nom}" sauvegardé avec succès (${saved.seances?.length ?? 0} séances).`);
+      }
+    } catch (error) {
+      notify(error instanceof Error ? error.message : "Erreur lors de la sauvegarde du planning.", 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const focusFromStats = (type: 'professeur' | 'classe' | 'matiere', id: number) => {
-    const value = type === 'professeur' ? (() => { const item = professeurs.find((professeur) => professeur.id === id); return item ? `${item.prenom} ${item.nom}`.trim() : ''; })() : type === 'classe' ? classes.find((classe) => classe.id === id)?.nom || '' : matieres.find((matiere) => matiere.id === id)?.nom || '';
-    const session = sourceSessions.find((item) => type === 'professeur' ? item.professeurNomComplet === value || item.professeurNomComplet?.includes(value.split(' ').at(-1) || '') : type === 'classe' ? item.classeNom === value : item.matiereNom === value);
-    if (!session) { notify('Aucune séance planifiée pour cet élément.', 'error'); return; }
+    const value =
+      type === 'professeur'
+        ? (() => {
+            const item = professeurs.find((professeur) => professeur.id === id);
+            return item ? `${item.prenom} ${item.nom}`.trim() : '';
+          })()
+        : type === 'classe'
+        ? classes.find((classe) => classe.id === id)?.nom || ''
+        : matieres.find((matiere) => matiere.id === id)?.nom || '';
+
+    const session = sourceSessions.find((item) =>
+      type === 'professeur'
+        ? item.professeurNomComplet === value || item.professeurNomComplet?.includes(value.split(' ').at(-1) || '')
+        : type === 'classe'
+        ? item.classeNom === value
+        : item.matiereNom === value
+    );
+
+    if (!session) {
+      notify('Aucune séance planifiée pour cet élément.', 'error');
+      return;
+    }
+
     setFilter({ type, value });
     setFocusDate(session.debut);
-    setTimeout(() => { const calendar = document.querySelector('.calendar-panel'); calendar?.scrollIntoView({ behavior:'smooth', block:'start' }); calendar?.animate([{boxShadow:'0 0 0 1px rgba(69,197,245,.8),0 0 36px rgba(69,197,245,.3)'},{boxShadow:'none'}],{duration:1400,easing:'ease-out'}); }, 80);
+    setTimeout(() => {
+      const calendar = document.querySelector('.calendar-panel');
+      calendar?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      calendar?.animate(
+        [{ boxShadow: '0 0 0 1px rgba(69,197,245,.8),0 0 36px rgba(69,197,245,.3)' }, { boxShadow: 'none' }],
+        { duration: 1400, easing: 'ease-out' }
+      );
+    }, 80);
     notify('Élément sélectionné et affiché dans le planning.');
   };
 
+  const unplannedCount = selectedPlanning?.seancesNonPlanifiees?.length ?? 0;
+
   return (
     <div className="planning-page">
-      <PageHeader title="Planning de la semaine" description="Visualisez, filtrez et organisez les séances de cours." createLabel="Nouvelle séance" loading={loading} onCreate={create} onRefresh={load} onImport={importCsv} onExport={exportCsv} />
-      <PlanningStats sessions={sourceSessions} professors={professeurs} classes={classes} subjects={matieres} salles={salles} onSelect={focusFromStats} />
-      <CalendarGrid seances={filteredSessions} professeurs={professeurs} classes={classes} matieres={matieres} salles={salles} plannings={plannings} selectedPlanningId={selectedPlanningId} onPlanningChange={onSelectedPlanningChange} filter={filter} onFilterChange={setFilter} onEdit={edit} onCreate={create} focusDate={focusDate} />
-      <footer className="planning-page__footer"><div><button type="button" onClick={() => setFilter({ type:'professeur', value:'' })}>Professeurs ({professeurs.length})</button><button type="button" onClick={() => setFilter({ type:'classe', value:'' })}>Classes ({classes.length})</button><button type="button" onClick={() => setFilter({ type:'matiere', value:'' })}>Matières ({matieres.length})</button></div><span>Les séances sont affichées en heure locale de l’établissement.</span></footer>
-      <SessionForm open={open} mode={mode} item={editing} professeurs={professeurs} classes={classes} matieres={matieres} salles={salles} loading={loading} onClose={() => setOpen(false)} onSave={save} onDelete={remove} />
+      <PageHeader
+        title="Planning de la semaine"
+        description="Visualisez, filtrez et organisez les séances de cours."
+        createLabel="Nouvelle séance"
+        loading={loading}
+        onCreate={create}
+        onRefresh={load}
+        onImport={importCsv}
+        onExport={exportCsv}
+        extraActions={
+          <Button
+            variant="secondary"
+            disabled={loading || sourceSessions.length === 0}
+            onClick={handleOpenSaveModal}
+            icon={<BookmarkCheck size={14} />}
+            title="Enregistrer les séances affichées sous un nom de planning"
+          >
+            Sauvegarder en planning
+          </Button>
+        }
+      />
+
+      {unplannedCount > 0 && (
+        <div className="planning-unplanned-banner">
+          <div className="planning-unplanned-banner__content">
+            <AlertTriangle size={18} className="planning-unplanned-banner__icon" />
+            <span>
+              <strong>{unplannedCount} séance{unplannedCount > 1 ? 's' : ''} non planifiée{unplannedCount > 1 ? 's' : ''}</strong> dans ce planning en raison de données manquantes (professeur, salle, créneau).
+            </span>
+          </div>
+          <Button
+            variant="secondary"
+            onClick={() => setUnplannedModalOpen(true)}
+            icon={<Eye size={14} />}
+          >
+            Voir les séances non planifiées ({unplannedCount})
+          </Button>
+        </div>
+      )}
+
+      <PlanningStats
+        sessions={sourceSessions}
+        professors={professeurs}
+        classes={classes}
+        subjects={matieres}
+        salles={salles}
+        onSelect={focusFromStats}
+      />
+
+      <CalendarGrid
+        seances={filteredSessions}
+        professeurs={professeurs}
+        classes={classes}
+        matieres={matieres}
+        salles={salles}
+        plannings={plannings}
+        selectedPlanningId={selectedPlanningId}
+        onPlanningChange={onSelectedPlanningChange}
+        filter={filter}
+        onFilterChange={setFilter}
+        onEdit={edit}
+        onCreate={create}
+        focusDate={focusDate}
+      />
+
+      <footer className="planning-page__footer">
+        <div>
+          <button type="button" onClick={() => setFilter({ type: 'professeur', value: '' })}>
+            Professeurs ({professeurs.length})
+          </button>
+          <button type="button" onClick={() => setFilter({ type: 'classe', value: '' })}>
+            Classes ({classes.length})
+          </button>
+          <button type="button" onClick={() => setFilter({ type: 'matiere', value: '' })}>
+            Matières ({matieres.length})
+          </button>
+        </div>
+        <span>Les séances sont affichées en heure locale de l’établissement.</span>
+      </footer>
+
+      <SessionForm
+        open={open}
+        mode={mode}
+        item={editing}
+        professeurs={professeurs}
+        classes={classes}
+        matieres={matieres}
+        salles={salles}
+        loading={loading}
+        onClose={() => setOpen(false)}
+        onSave={save}
+        onDelete={remove}
+      />
+
+      <SeancesNonPlanifieesModal
+        open={unplannedModalOpen}
+        onClose={() => setUnplannedModalOpen(false)}
+        planningName={selectedPlanning?.nom}
+        items={selectedPlanning?.seancesNonPlanifiees ?? []}
+      />
+
+      <Modal
+        open={saveModalOpen}
+        title="Sauvegarder le planning"
+        description="Donnez un nom pour enregistrer cette version de planning et persister l'ensemble des séances."
+        onClose={() => setSaveModalOpen(false)}
+        onSubmit={handleSavePlanning}
+        submitLabel="Enregistrer le planning"
+        loading={loading}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <label style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.9rem' }}>
+            <strong>Nom du planning</strong>
+            <input
+              type="text"
+              required
+              value={planningSaveName}
+              onChange={(e) => setPlanningSaveName(e.target.value)}
+              placeholder="ex: Semaine 43 - Lycée"
+              style={{
+                padding: '8px 12px',
+                borderRadius: '6px',
+                border: '1px solid var(--border-color, #cbd5e1)',
+                background: 'var(--surface-color, #ffffff)',
+                color: 'var(--text-color, #0f172a)',
+                fontSize: '0.9rem',
+              }}
+            />
+          </label>
+          <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted, #64748b)' }}>
+            Note : Si certaines séances n'ont pas de professeur, pas de salle ou pas de créneau attribué,
+            le backend les enregistrera automatiquement dans la table des séances non planifiées avec le motif associé.
+          </p>
+        </div>
+      </Modal>
     </div>
   );
 }

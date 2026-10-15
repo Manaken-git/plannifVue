@@ -1,11 +1,11 @@
-import { AlertCircle, CheckCircle2, X } from 'lucide-react';
+import { AlertCircle, AlertTriangle, CheckCircle2, X } from 'lucide-react';
 import { Button } from '../Button/Button';
 import './Toast.css';
 
 export interface ToastMessage {
   id: number;
   message: string;
-  type: 'success' | 'error';
+  type: 'success' | 'error' | 'warning';
 }
 
 interface ToastProps extends ToastMessage {
@@ -13,7 +13,7 @@ interface ToastProps extends ToastMessage {
 }
 
 export function Toast({ message, type, onClose }: ToastProps) {
-  const Icon = type === 'success' ? CheckCircle2 : AlertCircle;
+  const Icon = type === 'success' ? CheckCircle2 : type === 'warning' ? AlertTriangle : AlertCircle;
   return (
     <div className={`toast toast--${type}`} role="status">
       <Icon size={17} />
