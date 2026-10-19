@@ -30,6 +30,7 @@ export function ClassesTable({ items, searchTerm, onSearchChange, onEdit, onDele
               <tr>
                 <th><SortButton label="Classe" columnKey="nom" sortConfig={sorted.sortConfig} onSort={sorted.requestSort} /></th>
                 <th><SortButton label="Effectif" columnKey="effectif" sortConfig={sorted.sortConfig} onSort={sorted.requestSort} /></th>
+                <th>Référents</th>
                 <th>Demi-groupes</th>
                 <th>Règles Lycée</th>
                 <th><SortButton label="Périodes" columnKey="presences" sortConfig={sorted.sortConfig} onSort={sorted.requestSort} /></th>

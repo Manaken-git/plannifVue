@@ -76,6 +76,11 @@ export function SessionCard({ seance, top, height, left, width, warning, onClick
       </span>
       <span className="session-card__meta">
         {seance.professeurNomComplet || 'Enseignant non assigné'}
+        {(seance.type === 'VIE_DE_CLASSE' || seance.matiereNom?.toLowerCase().includes('vie de classe')) && (
+          <span style={{ marginLeft: 6, fontSize: '9px', background: '#fef3c7', color: '#b45309', padding: '1px 4px', borderRadius: 4, fontWeight: 700 }}>
+            🌟 Référent
+          </span>
+        )}
       </span>
       <span className="session-card__meta">
         {seance.classeNom || 'Classe non assignée'} · {seance.salleCode || 'Salle non assignée'}

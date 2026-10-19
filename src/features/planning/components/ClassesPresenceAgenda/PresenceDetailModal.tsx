@@ -57,9 +57,9 @@ export function PresenceDetailModal({
               style={{ backgroundColor: item.color.primary }}
             />
             <span className="google-event-detail__type">Présence Classe</span>
-            {status === 'current' && <Badge variant="success">En cours</Badge>}
-            {status === 'upcoming' && <Badge variant="info">À venir</Badge>}
-            {status === 'past' && <Badge variant="neutral">Terminée</Badge>}
+            {status === 'current' && <Badge tone="success">En cours</Badge>}
+            {status === 'upcoming' && <Badge tone="info">À venir</Badge>}
+            {status === 'past' && <Badge tone="neutral">Terminée</Badge>}
           </div>
           <h2 className="google-event-detail__title">{item.classeNom}</h2>
         </div>
