@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, BookmarkCheck, CalendarDays, Clock, Eye, Loader2, Sparkles } from 'lucide-react';
+import { Activity, AlertTriangle, BookmarkCheck, CalendarDays, Clock, Eye, Loader2, Sparkles } from 'lucide-react';
 import { useToast } from '../../../../app/providers/useToast';
+import { Badge } from '../../../../shared/ui/Badge/Badge';
 import { Button } from '../../../../shared/ui/Button/Button';
 import { Modal } from '../../../../shared/ui/Modal/Modal';
 import { PageHeader } from '../../../../shared/ui/PageHeader/PageHeader';
@@ -21,6 +22,7 @@ import { ClassesPresenceAgenda } from '../../components/ClassesPresenceAgenda';
 import { PlanningStats } from '../../components/PlanningStats/PlanningStats';
 import { SessionForm } from '../../components/SessionForm/SessionForm';
 import { SolverProgressModal } from '../../components/SolverProgressModal/SolverProgressModal';
+import { usePlanningHealth } from '../../hooks/usePlanningHealth';
 import { useSolverJob } from '../../hooks/useSolverJob';
 import type { CalendarFilter, Seance, SessionAssociations } from '../../types/planning.types';
 import './PlanningPage.css';
@@ -50,6 +52,9 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
   const [unplannedModalOpen, setUnplannedModalOpen] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [planningSaveName, setPlanningSaveName] = useState('');
+
+  // Diagnostic drawer state
+  const [statsDrawerOpen, setStatsDrawerOpen] = useState(false);
 
   // Solver modal and job orchestration
   const [solverModalOpen, setSolverModalOpen] = useState(false);
@@ -111,6 +116,14 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
     () => selectedPlanning?.seances ?? seances,
     [selectedPlanning, seances]
   );
+
+  const health = usePlanningHealth({
+    sessions: sourceSessions,
+    professors: professeurs,
+    classes: classes,
+    subjects: matieres,
+    salles: salles,
+  });
 
   const filteredSessions = useMemo(() => sourceSessions.filter((seance) => {
     if (filter.type === 'all' || !filter.value) return true;
@@ -314,6 +327,21 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
           homeView === 'schedule' ? (
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <Button
+                variant="secondary"
+                onClick={() => setStatsDrawerOpen(true)}
+                icon={<Activity size={15} />}
+                title="Ouvrir le panneau d'analyse et de diagnostic du planning"
+              >
+                Santé du planning
+                {health.totalAlerts > 0 ? (
+                  <Badge tone="warning">
+                    {health.totalAlerts} alerte{health.totalAlerts > 1 ? 's' : ''}
+                  </Badge>
+                ) : (
+                  <Badge tone="success">100%</Badge>
+                )}
+              </Button>
+              <Button
                 variant={solver.isSolving ? 'secondary' : 'primary'}
                 disabled={loading}
                 onClick={handleOpenSolver}
@@ -421,15 +449,6 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
             </div>
           )}
 
-          <PlanningStats
-            sessions={sourceSessions}
-            professors={professeurs}
-            classes={classes}
-            subjects={matieres}
-            salles={salles}
-            onSelect={focusFromStats}
-          />
-
           <CalendarGrid
             seances={filteredSessions}
             professeurs={professeurs}
@@ -532,6 +551,17 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
           setSolverModalOpen(false);
           onSelectedPlanningChange(savedId);
         }}
+      />
+
+      <PlanningStats
+        open={statsDrawerOpen}
+        onClose={() => setStatsDrawerOpen(false)}
+        sessions={sourceSessions}
+        professors={professeurs}
+        classes={classes}
+        subjects={matieres}
+        salles={salles}
+        onSelect={focusFromStats}
       />
     </div>
   );
