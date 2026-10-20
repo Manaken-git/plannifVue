@@ -21,6 +21,7 @@ import type { Professeur } from '../../../professeurs/types/professeur.types';
 import type { Salle } from '../../../salles/types/salle.types';
 
 import { SessionCard } from '../SessionCard/SessionCard';
+import { QuickReschedulePopover } from '../QuickReschedulePopover/QuickReschedulePopover';
 
 import type {
   CalendarFilter,
@@ -56,6 +57,17 @@ interface Props {
 
   onCreate: () => void;
   focusDate?: string;
+
+  onQuickReschedule?: (
+    seance: Seance,
+    newDebut: string,
+    newFin: string,
+    pinned?: boolean,
+  ) => Promise<void> | void;
+
+  onTogglePin?: (
+    seance: Seance,
+  ) => Promise<void> | void;
 }
 
 /* ========================================================================== */
@@ -201,7 +213,15 @@ export function CalendarGrid({
   onEdit,
   onCreate,
   focusDate,
+  onQuickReschedule,
+  onTogglePin,
 }: Props) {
+  const [draggedSeance, setDraggedSeance] = useState<Seance | null>(null);
+  const [dragOverDayIndex, setDragOverDayIndex] = useState<number | null>(null);
+  const [quickPopoverSession, setQuickPopoverSession] = useState<{
+    seance: Seance;
+    rect: DOMRect;
+  } | null>(null);
   const [
     weekStart,
     setWeekStart,
@@ -218,6 +238,21 @@ export function CalendarGrid({
   useEffect(() => {
     if (focusDate) setWeekStart(startOfWeek(new Date(focusDate)));
   }, [focusDate]);
+
+  const handleQuickShift = (seance: Seance, deltaHours: number) => {
+    const d = new Date(seance.debut);
+    const f = new Date(seance.fin);
+    d.setHours(d.getHours() + deltaHours);
+    f.setHours(f.getHours() + deltaHours);
+
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const toIso = (dt: Date) =>
+      `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}T${pad(
+        dt.getHours(),
+      )}:${pad(dt.getMinutes())}:00`;
+
+    onQuickReschedule?.(seance, toIso(d), toIso(f), seance.pinned ?? true);
+  };
 
   /* ------------------------------------------------------------------------ */
   /* Jours de la semaine                                                      */
@@ -1094,10 +1129,58 @@ export function CalendarGrid({
                     )
                       ? ' is-today'
                       : ''
-                  }`}
+                  }${dragOverDayIndex === dayIndex ? ' is-drag-over' : ''}`}
                   style={{
                     height:
                       calendarHeight,
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    if (dragOverDayIndex !== dayIndex) {
+                      setDragOverDayIndex(dayIndex);
+                    }
+                  }}
+                  onDragLeave={() => {
+                    setDragOverDayIndex(null);
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setDragOverDayIndex(null);
+                    let seanceToMove = draggedSeance;
+                    if (!seanceToMove) {
+                      try {
+                        const raw = e.dataTransfer.getData('application/json');
+                        if (raw) seanceToMove = JSON.parse(raw);
+                      } catch {}
+                    }
+                    if (!seanceToMove) return;
+
+                    const columnEl = e.currentTarget;
+                    const rect = columnEl.getBoundingClientRect();
+                    const offsetY = Math.max(0, e.clientY - rect.top);
+
+                    const totalMinutesFromStart = (offsetY / HOUR_HEIGHT) * 60;
+                    const roundedMinutes = Math.round(totalMinutesFromStart / 30) * 30;
+                    const startHour = visibleRange.startHour + Math.floor(roundedMinutes / 60);
+                    const startMinute = roundedMinutes % 60;
+
+                    const targetDay = weekDays[dayIndex];
+                    const pad = (n: number) => String(n).padStart(2, '0');
+                    const year = targetDay.getFullYear();
+                    const month = pad(targetDay.getMonth() + 1);
+                    const dayStr = pad(targetDay.getDate());
+                    const newDebut = `${year}-${month}-${dayStr}T${pad(startHour)}:${pad(startMinute)}:00`;
+
+                    const originalDurationMs = Math.max(
+                      30 * 60 * 1000,
+                      new Date(seanceToMove.fin).getTime() - new Date(seanceToMove.debut).getTime()
+                    );
+                    const newEndDate = new Date(new Date(newDebut).getTime() + originalDurationMs);
+                    const newFin = `${newEndDate.getFullYear()}-${pad(newEndDate.getMonth() + 1)}-${pad(newEndDate.getDate())}T${pad(newEndDate.getHours())}:${pad(newEndDate.getMinutes())}:00`;
+
+                    onQuickReschedule?.(seanceToMove, newDebut, newFin, true);
+                    setDraggedSeance(null);
                   }}
                 >
 
@@ -1198,6 +1281,14 @@ export function CalendarGrid({
                           width={width}
                           warning={warning}
                           onClick={() => onEdit(seance)}
+                          onQuickShift={handleQuickShift}
+                          onTogglePin={onTogglePin}
+                          onOpenQuickPopover={(s, rect) => setQuickPopoverSession({ seance: s, rect })}
+                          onDragStart={(_, s) => setDraggedSeance(s)}
+                          onDragEnd={() => {
+                            setDraggedSeance(null);
+                            setDragOverDayIndex(null);
+                          }}
                         />
                       );
                     });
@@ -1246,6 +1337,23 @@ export function CalendarGrid({
         </div>
 
       </div>
+
+      {quickPopoverSession && (
+        <QuickReschedulePopover
+          seance={quickPopoverSession.seance}
+          anchorRect={quickPopoverSession.rect}
+          days={weekDays}
+          onClose={() => setQuickPopoverSession(null)}
+          onApply={(newDebut, newFin, pinned) => {
+            onQuickReschedule?.(quickPopoverSession.seance, newDebut, newFin, pinned);
+            setQuickPopoverSession(null);
+          }}
+          onOpenFullEdit={(s) => {
+            setQuickPopoverSession(null);
+            onEdit(s);
+          }}
+        />
+      )}
     </section>
   );
 }

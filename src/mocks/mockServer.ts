@@ -261,6 +261,14 @@ function updateItem(database: MockDatabase, collection: CollectionName, payload:
     value.classeId = relationId(params, 'classeId', value.classeId);
     value.matiereId = relationId(params, 'matiereId', value.matiereId);
     value.salleId = relationId(params, 'salleId', value.salleId);
+
+    const enriched = enrichSession(database, value as unknown as MockSeance);
+    database.plannings?.forEach((p) => {
+      if (p.seances) {
+        const sIdx = p.seances.findIndex((s) => s.id === id);
+        if (sIdx >= 0) p.seances[sIdx] = { ...p.seances[sIdx], ...enriched };
+      }
+    });
   }
 
   assignNestedIds(collection, value);

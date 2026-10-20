@@ -51,6 +51,62 @@
     box-shadow var(--transition);
 }
 
+.session-card.is-dragging {
+  opacity: 0.45;
+  transform: scale(0.97);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* Micro actions toolbar on hover */
+.session-card__quick-actions {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease-in-out;
+  z-index: 10;
+}
+
+.session-card:hover .session-card__quick-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.session-card__quick-btn {
+  display: grid;
+  place-items: center;
+  height: 20px;
+  padding: 0 4px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(10, 18, 33, 0.85);
+  color: #f3f7fd;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: all 0.12s ease;
+}
+
+.session-card__quick-btn:hover {
+  background: var(--primary, #7477f5);
+  border-color: var(--primary, #7477f5);
+  color: white;
+  transform: scale(1.08);
+}
+
+.session-card__pin-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
+  font-size: 11px;
+}
+
 
 /* -------------------------------------------------------------------------- */
 /* Petit reflet supérieur                                                     */

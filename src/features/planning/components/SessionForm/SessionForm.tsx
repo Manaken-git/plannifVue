@@ -77,11 +77,21 @@ export function SessionForm({ open, mode, item, professeurs, classes, matieres, 
     event.preventDefault();
     const grp = groupeNom === 'Classe entière' ? undefined : groupeNom;
     const align = alignementId.trim() || undefined;
+    const prof = professeurs.find((p) => p.id === professeurId);
+    const cls = classes.find((c) => c.id === classeId);
+    const mat = matieres.find((m) => m.id === matiereId);
+    const sal = salles.find((s) => s.id === salleId);
+
     void onSave(
       {
+        ...item,
         id: item?.id,
         debut,
         fin,
+        professeurNomComplet: prof ? `${prof.prenom} ${prof.nom}` : item?.professeurNomComplet,
+        classeNom: cls?.nom ?? item?.classeNom,
+        matiereNom: mat?.nom ?? item?.matiereNom,
+        salleCode: sal?.code ?? item?.salleCode,
         type: typeSeance,
         typeSeance,
         groupe: grp,

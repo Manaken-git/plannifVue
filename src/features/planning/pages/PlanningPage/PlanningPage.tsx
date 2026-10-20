@@ -134,16 +134,62 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
     return true;
   }), [sourceSessions, filter]);
 
+  const isSameSession = (a: Seance, b: Seance) => {
+    if (a.id != null && b.id != null) return a.id === b.id;
+    return a.debut === b.debut && a.matiereNom === b.matiereNom && a.classeNom === b.classeNom;
+  };
+
+  const updateSessionInState = (updated: Seance) => {
+    setSeances((prev) => prev.map((s) => (isSameSession(s, updated) ? updated : s)));
+    setPlannings((prev) =>
+      prev.map((p) => ({
+        ...p,
+        seances: p.seances?.map((s) => (isSameSession(s, updated) ? updated : s)),
+      }))
+    );
+  };
+
+  const removeSessionFromState = (id: number) => {
+    setSeances((prev) => prev.filter((s) => s.id !== id));
+    setPlannings((prev) =>
+      prev.map((p) => ({
+        ...p,
+        seances: p.seances?.filter((s) => s.id !== id),
+      }))
+    );
+  };
+
   const save = async (data: Seance, associations: SessionAssociations) => {
     setLoading(true);
     try {
-      if (mode === 'create') await planningApi.create(data, associations);
-      else await planningApi.update(data, associations);
-      notify(mode === 'create' ? 'Séance planifiée.' : 'Séance mise à jour.');
+      let saved: Seance;
+      if (mode === 'create') {
+        saved = await planningApi.create(data, associations);
+        notify('Séance planifiée.');
+      } else {
+        saved = await planningApi.update(data, associations);
+        notify('Séance mise à jour.');
+      }
       setOpen(false);
+
+      const merged: Seance = { ...data, ...saved };
+      if (mode === 'create') {
+        setSeances((prev) => [...prev, merged]);
+        setPlannings((prev) =>
+          prev.map((p) =>
+            p.id === selectedPlanningId
+              ? { ...p, seances: [...(p.seances ?? []), merged] }
+              : p
+          )
+        );
+      } else {
+        updateSessionInState(merged);
+      }
+
       await load();
     } catch (error) {
       notify(error instanceof Error ? error.message : "Erreur lors de l'enregistrement de la séance.", 'error');
+    } finally {
       setLoading(false);
     }
   };
@@ -151,12 +197,14 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
   const remove = async (id: number) => {
     if (!window.confirm('Supprimer cette séance ?')) return;
     try {
+      removeSessionFromState(id);
       await planningApi.remove(id);
       notify('Séance supprimée.');
       setOpen(false);
       await load();
     } catch (error) {
       notify(error instanceof Error ? error.message : 'Suppression impossible.', 'error');
+      await load();
     }
   };
 
@@ -175,6 +223,88 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
       await planningApi.exportCsv();
     } catch {
       notify("Échec de l'export CSV.", 'error');
+    }
+  };
+
+  const handleQuickReschedule = async (
+    seance: Seance,
+    newDebut: string,
+    newFin: string,
+    pinned = true,
+  ) => {
+    const updated: Seance = {
+      ...seance,
+      debut: newDebut,
+      fin: newFin,
+      pinned,
+    };
+
+    // Mise à jour optimiste immédiate dans l'interface
+    updateSessionInState(updated);
+
+    try {
+      const profId = professeurs.find((p) => `${p.prenom} ${p.nom}` === seance.professeurNomComplet)?.id;
+      const clsId = classes.find((c) => c.nom === seance.classeNom)?.id;
+      const matId = matieres.find((m) => m.nom === seance.matiereNom)?.id;
+      const salId = salles.find((s) => s.code === seance.salleCode)?.id;
+
+      await planningApi.update(updated, {
+        professeurId: profId,
+        classeId: clsId,
+        matiereId: matId,
+        salleId: salId,
+      });
+
+      const timeStr = new Date(newDebut).toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      notify(`Séance déplacée à ${timeStr} ${pinned ? '🔒' : ''}`);
+    } catch (error) {
+      // Rétablir l'état initial en cas d'erreur
+      updateSessionInState(seance);
+      notify(
+        error instanceof Error ? error.message : 'Erreur lors du déplacement de la séance.',
+        'error',
+      );
+    }
+  };
+
+  const handleTogglePin = async (seance: Seance) => {
+    const newPinned = !seance.pinned;
+    const updated: Seance = {
+      ...seance,
+      pinned: newPinned,
+    };
+
+    // Mise à jour optimiste immédiate dans l'interface
+    updateSessionInState(updated);
+
+    try {
+      const profId = professeurs.find((p) => `${p.prenom} ${p.nom}` === seance.professeurNomComplet)?.id;
+      const clsId = classes.find((c) => c.nom === seance.classeNom)?.id;
+      const matId = matieres.find((m) => m.nom === seance.matiereNom)?.id;
+      const salId = salles.find((s) => s.code === seance.salleCode)?.id;
+
+      await planningApi.update(updated, {
+        professeurId: profId,
+        classeId: clsId,
+        matiereId: matId,
+        salleId: salId,
+      });
+
+      notify(
+        newPinned
+          ? 'Séance verrouillée 🔒 (Timefold ne la déplacera pas)'
+          : 'Séance déverrouillée 🔓',
+      );
+    } catch (error) {
+      // Rétablir l'état initial en cas d'erreur
+      updateSessionInState(seance);
+      notify(
+        error instanceof Error ? error.message : 'Erreur lors du verrouillage de la séance.',
+        'error',
+      );
     }
   };
 
@@ -463,6 +593,8 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
             onEdit={edit}
             onCreate={create}
             focusDate={focusDate}
+            onQuickReschedule={handleQuickReschedule}
+            onTogglePin={handleTogglePin}
           />
 
           <footer className="planning-page__footer">

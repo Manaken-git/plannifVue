@@ -696,6 +696,11 @@
   border-right: none;
 }
 
+.calendar-grid__column.is-drag-over {
+  background: rgba(116, 119, 245, 0.12);
+  box-shadow: inset 0 0 0 2px rgba(116, 119, 245, 0.4);
+}
+
 
 /* Jour actuel */
 

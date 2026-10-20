@@ -13,6 +13,7 @@ export interface Seance {
   alignementCode?: string;
   alignementId?: string; // alias
   equipementsRequis?: string[];
+  pinned?: boolean;
 }
 
 export interface SessionAssociations {

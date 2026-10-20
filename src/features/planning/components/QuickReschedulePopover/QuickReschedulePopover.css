@@ -1,0 +1,194 @@
+.quick-reschedule-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1040;
+  background: rgba(4, 9, 20, 0.4);
+  backdrop-filter: blur(2px);
+  animation: popoverFadeIn 0.15s ease-out;
+}
+
+@keyframes popoverFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.quick-reschedule-popover {
+  position: fixed;
+  z-index: 1050;
+  width: min(340px, 92vw);
+  background: linear-gradient(160deg, #16243d, #0b1424);
+  border: 1px solid rgba(143, 146, 255, 0.28);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: popoverScale 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--text-primary, #f3f7fd);
+}
+
+@keyframes popoverScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.quick-reschedule-popover__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(166, 183, 207, 0.1);
+  padding-bottom: 10px;
+}
+
+.quick-reschedule-popover__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary, #f3f7fd);
+}
+
+.quick-reschedule-popover__section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.quick-reschedule-popover__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted, #7a899f);
+}
+
+.quick-reschedule-popover__days {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+.quick-reschedule-popover__day-btn {
+  padding: 6px 4px;
+  border-radius: 6px;
+  border: 1px solid rgba(166, 183, 207, 0.12);
+  background: rgba(16, 26, 44, 0.6);
+  color: var(--text-secondary, #b5c0d0);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.12s ease;
+}
+
+.quick-reschedule-popover__day-btn:hover {
+  background: rgba(31, 45, 71, 0.8);
+  color: var(--text-primary, #f3f7fd);
+}
+
+.quick-reschedule-popover__day-btn.is-active {
+  background: var(--primary, #7477f5);
+  border-color: var(--primary, #7477f5);
+  color: white;
+  box-shadow: 0 2px 8px rgba(116, 119, 245, 0.35);
+}
+
+.quick-reschedule-popover__slots {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px;
+}
+
+.quick-reschedule-popover__slot-btn {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(166, 183, 207, 0.1);
+  background: rgba(16, 26, 44, 0.6);
+  color: var(--text-secondary, #b5c0d0);
+  font-size: 0.75rem;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.12s ease;
+}
+
+.quick-reschedule-popover__slot-btn:hover {
+  background: rgba(31, 45, 71, 0.8);
+  color: var(--text-primary, #f3f7fd);
+}
+
+.quick-reschedule-popover__slot-btn.is-active {
+  background: rgba(116, 119, 245, 0.2);
+  border-color: var(--primary, #7477f5);
+  color: var(--text-primary, #f3f7fd);
+  font-weight: 600;
+}
+
+.quick-reschedule-popover__custom-time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quick-reschedule-popover__time-input {
+  flex: 1;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(166, 183, 207, 0.18);
+  background: rgba(7, 15, 27, 0.7);
+  color: var(--text-primary, #f3f7fd);
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+.quick-reschedule-popover__pin-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(7, 15, 27, 0.45);
+  border: 1px solid rgba(166, 183, 207, 0.1);
+  cursor: pointer;
+}
+
+.quick-reschedule-popover__pin-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary, #7477f5);
+  cursor: pointer;
+}
+
+.quick-reschedule-popover__actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(166, 183, 207, 0.1);
+}
+
+.quick-reschedule-popover__more-link {
+  background: none;
+  border: none;
+  color: var(--primary, #7477f5);
+  font-size: 0.78rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.quick-reschedule-popover__more-link:hover {
+  color: var(--primary-hover, #8588ff);
+}
