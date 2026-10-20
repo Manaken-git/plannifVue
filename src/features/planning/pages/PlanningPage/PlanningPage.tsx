@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, BookmarkCheck, CalendarDays, Clock, Eye } from 'lucide-react';
+import { AlertTriangle, BookmarkCheck, CalendarDays, Clock, Eye, Loader2, Sparkles } from 'lucide-react';
 import { useToast } from '../../../../app/providers/useToast';
 import { Button } from '../../../../shared/ui/Button/Button';
 import { Modal } from '../../../../shared/ui/Modal/Modal';
@@ -20,6 +20,8 @@ import { CalendarGrid } from '../../components/CalendarGrid/CalendarGrid';
 import { ClassesPresenceAgenda } from '../../components/ClassesPresenceAgenda';
 import { PlanningStats } from '../../components/PlanningStats/PlanningStats';
 import { SessionForm } from '../../components/SessionForm/SessionForm';
+import { SolverProgressModal } from '../../components/SolverProgressModal/SolverProgressModal';
+import { useSolverJob } from '../../hooks/useSolverJob';
 import type { CalendarFilter, Seance, SessionAssociations } from '../../types/planning.types';
 import './PlanningPage.css';
 
@@ -48,6 +50,29 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
   const [unplannedModalOpen, setUnplannedModalOpen] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [planningSaveName, setPlanningSaveName] = useState('');
+
+  // Solver modal and job orchestration
+  const [solverModalOpen, setSolverModalOpen] = useState(false);
+
+  const solver = useSolverJob({
+    onSuccess: async (savedPlanningId, finalScore) => {
+      notify(`Optimisation terminée ! Score : ${finalScore || 'optimal'}`);
+      await load();
+      if (savedPlanningId) {
+        onSelectedPlanningChange(savedPlanningId);
+      }
+    },
+    onError: (errMsg) => {
+      notify(errMsg, 'error');
+    },
+  });
+
+  const handleOpenSolver = () => {
+    setSolverModalOpen(true);
+    if (!solver.isSolving && solver.status !== 'COMPLETED') {
+      void solver.startSolving();
+    }
+  };
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -287,18 +312,61 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
         onExport={exportCsv}
         extraActions={
           homeView === 'schedule' ? (
-            <Button
-              variant="secondary"
-              disabled={loading || sourceSessions.length === 0}
-              onClick={handleOpenSaveModal}
-              icon={<BookmarkCheck size={14} />}
-              title="Enregistrer les séances affichées sous un nom de planning"
-            >
-              Sauvegarder en planning
-            </Button>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <Button
+                variant={solver.isSolving ? 'secondary' : 'primary'}
+                disabled={loading}
+                onClick={handleOpenSolver}
+                icon={solver.isSolving ? <Loader2 size={15} className="solver-modal__icon-spinner" /> : <Sparkles size={15} />}
+                title="Lancer l'optimisation automatique des cours et salles par Timefold"
+              >
+                {solver.isSolving ? `Optimisation (${solver.progress?.elapsedSeconds ?? 0}s)...` : 'Optimiser le planning'}
+              </Button>
+              <Button
+                variant="secondary"
+                disabled={loading || sourceSessions.length === 0}
+                onClick={handleOpenSaveModal}
+                icon={<BookmarkCheck size={14} />}
+                title="Enregistrer les séances affichées sous un nom de planning"
+              >
+                Sauvegarder en planning
+              </Button>
+            </div>
           ) : undefined
         }
       />
+
+      {/* Solver running in background banner */}
+      {solver.isSolving && !solverModalOpen && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '10px 16px',
+            backgroundColor: '#eff6ff',
+            border: '1px solid #bfdbfe',
+            borderRadius: '8px',
+            marginBottom: '16px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Loader2 size={18} className="solver-modal__icon-spinner" />
+            <span style={{ fontSize: '0.9rem', color: '#1e40af' }}>
+              <strong>Optimisation Timefold en arrière-plan</strong> : Score actuel{' '}
+              <code>{solver.progress?.score || 'en calcul...'}</code> ({solver.progress?.elapsedSeconds ?? 0}s écoulées)
+            </span>
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <Button variant="secondary" onClick={() => setSolverModalOpen(true)}>
+              Afficher les détails
+            </Button>
+            <Button variant="danger" onClick={solver.stopSolving}>
+              Arrêter
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Main Home Switcher */}
       <div className="planning-view-switcher" role="tablist" aria-label="Mode d'affichage d'accueil">
@@ -450,6 +518,21 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
           </p>
         </div>
       </Modal>
+
+      <SolverProgressModal
+        open={solverModalOpen}
+        onClose={() => setSolverModalOpen(false)}
+        status={solver.status}
+        progress={solver.progress}
+        result={solver.result}
+        error={solver.error}
+        isSolving={solver.isSolving}
+        onStop={solver.stopSolving}
+        onViewResult={(savedId) => {
+          setSolverModalOpen(false);
+          onSelectedPlanningChange(savedId);
+        }}
+      />
     </div>
   );
 }

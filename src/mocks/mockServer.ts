@@ -391,6 +391,39 @@ export async function mockRequest<T>(path: string, init?: RequestInit): Promise<
     }
   }
 
+  if (endpoint === 'planning') {
+    if (action === 'jobs') {
+      if (!idSegment && method === 'POST') {
+        return {
+          jobId: `mock-job-${Date.now()}`,
+          status: 'SOLVING',
+          submittedAt: new Date().toISOString(),
+          solverSpentLimitSeconds: 120,
+        } as T;
+      }
+      if (idSegment && segments[2] === 'stop' && method === 'POST') {
+        return {
+          jobId: idSegment,
+          status: 'TERMINATED_EARLY',
+          message: 'Solver job terminated manually.',
+          savedPlanningId: 1,
+          score: '0hard/-20soft',
+        } as T;
+      }
+      if (idSegment && method === 'GET') {
+        return {
+          jobId: idSegment,
+          status: 'SOLVING',
+          submittedAt: new Date().toISOString(),
+          score: '0hard/-20soft',
+          hardScore: 0,
+          softScore: -20,
+          savedPlanningId: 1,
+        } as T;
+      }
+    }
+  }
+
   const collection = endpointToCollection[endpoint];
 
   if (!collection) throw new Error(`Route mock non gérée : ${method} ${url.pathname}`);
