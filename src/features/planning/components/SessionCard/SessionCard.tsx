@@ -19,6 +19,8 @@ interface Props {
   height: number;
   left?: number | string;
   width?: number | string;
+  isNarrow?: boolean;
+  isRightAligned?: boolean;
   warning?: string;
   onClick: () => void;
   onTogglePin?: (seance: Seance) => void;
@@ -53,6 +55,8 @@ export function SessionCard({
   height,
   left,
   width,
+  isNarrow,
+  isRightAligned,
   warning,
   onClick,
   onTogglePin,
@@ -90,7 +94,11 @@ export function SessionCard({
       onDragEnd={handleDragEnd}
       className={`session-card session-card--${colorIndex(seance)}${
         warning ? ' has-warning' : ''
-      }${isDragging ? ' is-dragging' : ''}`}
+      }${isDragging ? ' is-dragging' : ''}${
+        isNarrow ? ' is-narrow' : ''
+      }${
+        isRightAligned ? ' is-right-aligned' : ''
+      }`}
       style={customStyle}
       onClick={onClick}
       onKeyDown={(e) => {

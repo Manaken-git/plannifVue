@@ -1,7 +1,9 @@
 import {
+  Calendar,
   CalendarDays,
   ChevronLeft,
   ChevronRight,
+  Layers,
   SlidersHorizontal,
 } from 'lucide-react';
 import {
@@ -238,6 +240,8 @@ export function CalendarGrid({
       ),
   );
 
+  const [showWeekend, setShowWeekend] = useState(false);
+
   const today =
     new Date();
 
@@ -246,7 +250,26 @@ export function CalendarGrid({
   }, [focusDate]);
 
   /* ------------------------------------------------------------------------ */
-  /* Jours de la semaine                                                      */
+  /* Détection de séances le week-end                                         */
+  /* ------------------------------------------------------------------------ */
+
+  const hasWeekendSessions = useMemo(() => {
+    const saturday = new Date(weekStart);
+    saturday.setDate(weekStart.getDate() + 5);
+    const sunday = new Date(weekStart);
+    sunday.setDate(weekStart.getDate() + 6);
+
+    return seances.some((seance) => {
+      const date = asDate(seance.debut);
+      if (!date) return false;
+      return isSameDay(date, saturday) || isSameDay(date, sunday);
+    });
+  }, [seances, weekStart]);
+
+  const is5Days = !showWeekend && !hasWeekendSessions;
+
+  /* ------------------------------------------------------------------------ */
+  /* Jours de la semaine (5 jours Lun-Ven ou 7 jours)                         */
   /* ------------------------------------------------------------------------ */
 
   const weekDays =
@@ -254,7 +277,7 @@ export function CalendarGrid({
       () =>
         Array.from(
           {
-            length: 7,
+            length: is5Days ? 5 : 7,
           },
           (
             _,
@@ -273,7 +296,7 @@ export function CalendarGrid({
             return day;
           },
         ),
-      [weekStart],
+      [weekStart, is5Days],
     );
 
   /* ------------------------------------------------------------------------ */
@@ -462,11 +485,17 @@ export function CalendarGrid({
   const weekLabel =
     useMemo(
       () => {
+        if (!weekDays || weekDays.length === 0) {
+          return '';
+        }
+
         const first =
           weekDays[0];
 
         const last =
-          weekDays[6];
+          weekDays[
+            weekDays.length - 1
+          ];
 
         const formatter =
           new Intl.DateTimeFormat(
@@ -984,11 +1013,66 @@ export function CalendarGrid({
       </div>
 
       {/* ==================================================================== */}
+      {/* Barre d'accès rapide aux classes & toggle semaine                     */}
+      {/* ==================================================================== */}
+      <div className="calendar-quick-strip">
+        <div className="calendar-quick-classes">
+          <span className="calendar-quick-label">
+            <Layers size={13} />
+            <span>Classes :</span>
+          </span>
+          <button
+            type="button"
+            className={`calendar-class-pill ${filter.type === 'all' || (filter.type === 'classe' && !filter.value) ? 'is-active' : ''}`}
+            onClick={() => onFilterChange({ type: 'all', value: '' })}
+          >
+            Toutes
+          </button>
+          {classes.map((c) => {
+            const isActive = filter.type === 'classe' && filter.value === c.nom;
+            return (
+              <button
+                key={c.id ?? c.nom}
+                type="button"
+                className={`calendar-class-pill ${isActive ? 'is-active' : ''}`}
+                onClick={() => {
+                  if (isActive) {
+                    onFilterChange({ type: 'all', value: '' });
+                  } else {
+                    onFilterChange({ type: 'classe', value: c.nom });
+                  }
+                }}
+              >
+                {c.nom}
+              </button>
+            );
+          })}
+        </div>
+
+        <button
+          type="button"
+          className={`calendar-view-toggle ${is5Days ? 'is-5d' : 'is-7d'}`}
+          onClick={() => setShowWeekend((prev) => !prev)}
+          title={
+            hasWeekendSessions
+              ? 'Séances planifiées le week-end (affichage 7j actif)'
+              : is5Days
+                ? 'Afficher Samedi et Dimanche'
+                : 'Masquer le week-end (Semaine Lun-Ven)'
+          }
+        >
+          <Calendar size={13} />
+          <span>{is5Days ? '5 jours' : '7 jours'}</span>
+          {hasWeekendSessions && <span className="calendar-weekend-dot" title="Séances présentes le week-end" />}
+        </button>
+      </div>
+
+      {/* ==================================================================== */}
       {/* Calendrier                                                           */}
       {/* ==================================================================== */}
 
       <div
-        className="calendar-grid"
+        className={`calendar-grid ${is5Days ? 'calendar-grid--5-days' : 'calendar-grid--7-days'}`}
         style={
           {
             '--calendar-height':
@@ -1298,6 +1382,8 @@ export function CalendarGrid({
 
                       let left: string | undefined;
                       let width: string | undefined;
+                      let isNarrow = false;
+                      let isRightAligned = false;
 
                       if (overlapping.length > 0) {
                         const allCluster = [seance, ...overlapping].sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
@@ -1305,6 +1391,8 @@ export function CalendarGrid({
                         const totalCol = allCluster.length;
                         left = `calc(${myIdx * (100 / totalCol)}% + 3px)`;
                         width = `calc(${100 / totalCol}% - 6px)`;
+                        isNarrow = totalCol >= 2;
+                        isRightAligned = myIdx >= Math.floor(totalCol / 2);
                       }
 
                       // Alerte de capacité de la salle vs effectif
@@ -1329,6 +1417,8 @@ export function CalendarGrid({
                           height={pos.height}
                           left={left}
                           width={width}
+                          isNarrow={isNarrow}
+                          isRightAligned={isRightAligned}
                           warning={warning}
                           onClick={() => onEdit(seance)}
                           onTogglePin={onTogglePin}

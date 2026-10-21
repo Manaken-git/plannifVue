@@ -97,6 +97,151 @@
     inset 0 -1px 0 rgba(255, 255, 255, 0.012);
 }
 
+/* ========================================================================== */
+/* Barre d'accès rapide aux classes (Quick Class Filter Pills) & Toggle 5j/7j */
+/* ========================================================================== */
+
+.calendar-quick-strip {
+  position: relative;
+  z-index: 15;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 8px 16px;
+
+  border-bottom: 1px solid rgba(166, 183, 207, 0.08);
+
+  background: rgba(10, 18, 32, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.calendar-quick-classes {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 2px 0;
+}
+
+.calendar-quick-classes::-webkit-scrollbar {
+  display: none;
+}
+
+.calendar-quick-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted, #718198);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+.calendar-class-pill {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: var(--radius-full, 9999px);
+  border: 1px solid var(--border-subtle, rgba(166, 183, 207, 0.12));
+  background: rgba(16, 26, 42, 0.6);
+  color: var(--text-secondary, #b5c0d0);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition, 0.15s ease);
+  user-select: none;
+}
+
+.calendar-class-pill:hover {
+  color: var(--text-primary, #ffffff);
+  border-color: rgba(143, 146, 255, 0.35);
+  background: rgba(116, 119, 245, 0.14);
+  transform: translateY(-1px);
+}
+
+.calendar-class-pill.is-active {
+  color: #ffffff;
+  background: linear-gradient(135deg, #7477f5, #5559e8);
+  border-color: rgba(143, 146, 255, 0.6);
+  box-shadow: 0 0 14px rgba(116, 119, 245, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.calendar-class-pill:active {
+  transform: translateY(0);
+}
+
+/* Bouton toggle 5j / 7j */
+.calendar-view-toggle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid rgba(166, 183, 207, 0.14);
+  background: rgba(16, 26, 42, 0.6);
+  color: var(--text-secondary, #cbd5e1);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition, 0.15s ease);
+  user-select: none;
+}
+
+.calendar-view-toggle:hover {
+  color: #ffffff;
+  border-color: rgba(143, 146, 255, 0.35);
+  background: rgba(116, 119, 245, 0.14);
+  transform: translateY(-1px);
+}
+
+.calendar-view-toggle:active {
+  transform: translateY(0);
+}
+
+.calendar-view-toggle.is-5d {
+  border-color: rgba(116, 119, 245, 0.3);
+  background: rgba(116, 119, 245, 0.1);
+  color: #d8daff;
+}
+
+.calendar-weekend-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #f59e0b;
+  box-shadow: 0 0 8px #f59e0b;
+  display: inline-block;
+}
+
+/* Mode 5 jours par défaut (Lundi - Vendredi) */
+.calendar-grid--5-days .calendar-grid__header,
+.calendar-grid--5-days .calendar-grid__body-scroll,
+.calendar-grid--5-days .calendar-grid__body {
+  min-width: 860px;
+}
+
+.calendar-grid--5-days .calendar-grid__header,
+.calendar-grid--5-days .calendar-grid__body {
+  grid-template-columns:
+    84px
+    repeat(5, minmax(180px, 1fr));
+}
 
 /* ========================================================================== */
 /* Navigation semaine                                                         */
