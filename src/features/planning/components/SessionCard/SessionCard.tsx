@@ -2,8 +2,6 @@ import {
   Atom,
   BookOpen,
   Calculator,
-  ChevronLeft,
-  ChevronRight,
   Clock,
   Globe2,
   Landmark,
@@ -23,7 +21,6 @@ interface Props {
   width?: number | string;
   warning?: string;
   onClick: () => void;
-  onQuickShift?: (seance: Seance, deltaHours: number) => void;
   onTogglePin?: (seance: Seance) => void;
   onOpenQuickPopover?: (seance: Seance, rect: DOMRect) => void;
   onDragStart?: (e: React.DragEvent<HTMLDivElement>, seance: Seance) => void;
@@ -58,7 +55,6 @@ export function SessionCard({
   width,
   warning,
   onClick,
-  onQuickShift,
   onTogglePin,
   onOpenQuickPopover,
   onDragStart,
@@ -209,28 +205,6 @@ export function SessionCard({
         onClick={(e) => e.stopPropagation()}
         onMouseDown={(e) => e.stopPropagation()}
       >
-        {onQuickShift && (
-          <>
-            <button
-              type="button"
-              className="session-card__quick-btn"
-              title="Décaler de -1h plus tôt"
-              onClick={() => onQuickShift(seance, -1)}
-            >
-              <ChevronLeft size={12} />
-              <span>1h</span>
-            </button>
-            <button
-              type="button"
-              className="session-card__quick-btn"
-              title="Décaler de +1h plus tard"
-              onClick={() => onQuickShift(seance, 1)}
-            >
-              <span>1h</span>
-              <ChevronRight size={12} />
-            </button>
-          </>
-        )}
 
         {onTogglePin && (
           <button

@@ -218,6 +218,12 @@ export function CalendarGrid({
 }: Props) {
   const [draggedSeance, setDraggedSeance] = useState<Seance | null>(null);
   const [dragOverDayIndex, setDragOverDayIndex] = useState<number | null>(null);
+  const [dragPreview, setDragPreview] = useState<{
+    dayIndex: number;
+    top: number;
+    height: number;
+    timeLabel: string;
+  } | null>(null);
   const [quickPopoverSession, setQuickPopoverSession] = useState<{
     seance: Seance;
     rect: DOMRect;
@@ -238,21 +244,6 @@ export function CalendarGrid({
   useEffect(() => {
     if (focusDate) setWeekStart(startOfWeek(new Date(focusDate)));
   }, [focusDate]);
-
-  const handleQuickShift = (seance: Seance, deltaHours: number) => {
-    const d = new Date(seance.debut);
-    const f = new Date(seance.fin);
-    d.setHours(d.getHours() + deltaHours);
-    f.setHours(f.getHours() + deltaHours);
-
-    const pad = (n: number) => String(n).padStart(2, '0');
-    const toIso = (dt: Date) =>
-      `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}T${pad(
-        dt.getHours(),
-      )}:${pad(dt.getMinutes())}:00`;
-
-    onQuickReschedule?.(seance, toIso(d), toIso(f), seance.pinned ?? true);
-  };
 
   /* ------------------------------------------------------------------------ */
   /* Jours de la semaine                                                      */
@@ -1137,16 +1128,59 @@ export function CalendarGrid({
                   onDragOver={(e) => {
                     e.preventDefault();
                     e.dataTransfer.dropEffect = 'move';
+
+                    const columnEl = e.currentTarget;
+                    const rect = columnEl.getBoundingClientRect();
+                    const offsetY = Math.max(0, e.clientY - rect.top);
+
+                    const totalMinutesFromStart = (offsetY / HOUR_HEIGHT) * 60;
+                    const roundedMinutes = Math.round(totalMinutesFromStart / 30) * 30;
+                    const startHour = visibleRange.startHour + Math.floor(roundedMinutes / 60);
+                    const startMinute = roundedMinutes % 60;
+
+                    const previewTop = ((startHour - visibleRange.startHour) * 60 + startMinute) * (HOUR_HEIGHT / 60);
+
+                    let durationMinutes = 60;
+                    if (draggedSeance) {
+                      const diff = (new Date(draggedSeance.fin).getTime() - new Date(draggedSeance.debut).getTime()) / (60 * 1000);
+                      if (diff > 0) durationMinutes = diff;
+                    }
+                    const previewHeight = (durationMinutes / 60) * HOUR_HEIGHT;
+
+                    const pad = (n: number) => String(n).padStart(2, '0');
+                    const endTotalMin = startHour * 60 + startMinute + durationMinutes;
+                    const endHour = Math.floor(endTotalMin / 60);
+                    const endMinute = endTotalMin % 60;
+                    const timeLabel = `${pad(startHour)}:${pad(startMinute)} – ${pad(endHour)}:${pad(endMinute)}`;
+
+                    if (
+                      !dragPreview ||
+                      dragPreview.dayIndex !== dayIndex ||
+                      dragPreview.top !== previewTop ||
+                      dragPreview.height !== previewHeight
+                    ) {
+                      setDragPreview({
+                        dayIndex,
+                        top: previewTop,
+                        height: previewHeight,
+                        timeLabel,
+                      });
+                    }
+
                     if (dragOverDayIndex !== dayIndex) {
                       setDragOverDayIndex(dayIndex);
                     }
                   }}
-                  onDragLeave={() => {
-                    setDragOverDayIndex(null);
+                  onDragLeave={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                      setDragOverDayIndex(null);
+                      setDragPreview(null);
+                    }
                   }}
                   onDrop={(e) => {
                     e.preventDefault();
                     setDragOverDayIndex(null);
+                    setDragPreview(null);
                     let seanceToMove = draggedSeance;
                     if (!seanceToMove) {
                       try {
@@ -1188,11 +1222,11 @@ export function CalendarGrid({
 
                   {hours.map(
                     (
-                      hour,
+                      h,
                     ) => (
                       <div
                         key={
-                          hour
+                          h
                         }
                         className="calendar-grid__hour"
                         style={{
@@ -1223,6 +1257,22 @@ export function CalendarGrid({
                       <span style={{ fontSize: '10px', color: 'rgba(245, 158, 11, 0.7)', padding: '2px 6px', fontWeight: 500 }}>
                         Pause méridienne
                       </span>
+                    </div>
+                  )}
+
+                  {/* Ombre portée de largage / Drop Target Preview */}
+                  {dragPreview && dragPreview.dayIndex === dayIndex && (
+                    <div
+                      className="calendar-grid__drop-preview"
+                      style={{
+                        top: dragPreview.top,
+                        height: dragPreview.height,
+                      }}
+                    >
+                      <div className="calendar-grid__drop-preview-content">
+                        <span className="calendar-grid__drop-preview-time">{dragPreview.timeLabel}</span>
+                        <span className="calendar-grid__drop-preview-label">Déplacer ici</span>
+                      </div>
                     </div>
                   )}
 
@@ -1281,13 +1331,13 @@ export function CalendarGrid({
                           width={width}
                           warning={warning}
                           onClick={() => onEdit(seance)}
-                          onQuickShift={handleQuickShift}
                           onTogglePin={onTogglePin}
                           onOpenQuickPopover={(s, rect) => setQuickPopoverSession({ seance: s, rect })}
                           onDragStart={(_, s) => setDraggedSeance(s)}
                           onDragEnd={() => {
                             setDraggedSeance(null);
                             setDragOverDayIndex(null);
+                            setDragPreview(null);
                           }}
                         />
                       );

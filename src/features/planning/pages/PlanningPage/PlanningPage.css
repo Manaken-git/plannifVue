@@ -64,10 +64,10 @@
   justify-content: space-between;
   gap: 16px;
   padding: 10px 16px;
-  background: rgba(239, 68, 68, 0.09);
-  border: 1px solid rgba(239, 68, 68, 0.28);
-  border-radius: 8px;
-  color: var(--text-color, #1e293b);
+  background: var(--danger-soft, rgba(251, 127, 148, 0.10));
+  border: 1px solid rgba(251, 127, 148, 0.28);
+  border-radius: var(--radius-sm, 9px);
+  color: var(--text-primary, #f3f7fd);
   animation: fadeIn 0.2s ease-in-out;
 }
 
@@ -79,7 +79,7 @@
 }
 
 .planning-unplanned-banner__icon {
-  color: #ef4444;
+  color: var(--danger, #fb7f94);
   flex-shrink: 0;
 }
 

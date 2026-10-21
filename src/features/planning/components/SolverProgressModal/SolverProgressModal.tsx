@@ -58,7 +58,7 @@ export function SolverProgressModal({
 
         {status === 'COMPLETED' && (
           <div className="solver-modal__status-box solver-modal__status-box--completed">
-            <CheckCircle2 color="#16a34a" size={26} />
+            <CheckCircle2 color="var(--success, #45d5a3)" size={26} />
             <div>
               <strong>Résolution terminée avec succès !</strong>
               <p className="text-sm text-muted">
@@ -70,7 +70,7 @@ export function SolverProgressModal({
 
         {status === 'TERMINATED_EARLY' && (
           <div className="solver-modal__status-box solver-modal__status-box--stopped">
-            <CheckCircle2 color="#d97706" size={26} />
+            <CheckCircle2 color="var(--warning, #f6c760)" size={26} />
             <div>
               <strong>Calcul interrompu manuellement</strong>
               <p className="text-sm text-muted">
@@ -82,7 +82,7 @@ export function SolverProgressModal({
 
         {status === 'FAILED' && (
           <div className="solver-modal__status-box solver-modal__status-box--failed">
-            <XCircle color="#dc2626" size={26} />
+            <XCircle color="var(--danger, #fb7f94)" size={26} />
             <div>
               <strong>Échec de la résolution</strong>
               <p className="text-sm text-muted">{error || 'Une erreur est survenue pendant le calcul.'}</p>
