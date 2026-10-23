@@ -2,8 +2,9 @@
   position: fixed;
   inset: 0;
   z-index: 1040;
-  background: rgba(2, 6, 12, 0.55);
-  backdrop-filter: blur(4px);
+  background: rgba(2, 6, 12, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   animation: popoverFadeIn 0.15s ease-out;
 }
 
@@ -20,17 +21,18 @@
   position: fixed;
   z-index: 1050;
   width: min(340px, 92vw);
-  background: var(--bg-surface-raised, rgba(20, 31, 51, 0.95));
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-strong, rgba(166, 183, 207, 0.23));
+  background: var(--bg-surface-raised);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-md, 13px);
-  box-shadow: var(--shadow-lg, 0 30px 80px rgba(0, 0, 0, 0.34));
+  box-shadow: var(--shadow-lg);
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
   animation: popoverScale 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-  color: var(--text-primary, #f3f7fd);
+  color: var(--text-primary);
 }
 
 @keyframes popoverScale {
@@ -48,7 +50,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--border-subtle, rgba(166, 183, 207, 0.085));
+  border-bottom: 1px solid var(--border-subtle);
   padding-bottom: 10px;
 }
 
@@ -56,9 +58,9 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.9rem;
+  font-size: 14px;
   font-weight: 700;
-  color: var(--text-primary, #f3f7fd);
+  color: var(--text-primary);
 }
 
 .quick-reschedule-popover__section {
@@ -68,11 +70,11 @@
 }
 
 .quick-reschedule-popover__label {
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted, #7a899f);
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
 }
 
 .quick-reschedule-popover__days {
@@ -84,25 +86,25 @@
 .quick-reschedule-popover__day-btn {
   padding: 6px 4px;
   border-radius: var(--radius-xs, 6px);
-  border: 1px solid var(--border-subtle, rgba(166, 183, 207, 0.085));
-  background: var(--bg-surface-soft, rgba(12, 21, 36, 0.62));
-  color: var(--text-secondary, #b5c0d0);
-  font-size: 0.78rem;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface-soft);
+  color: var(--text-secondary);
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   text-align: center;
-  transition: all var(--transition, 160ms ease);
+  transition: all var(--transition);
 }
 
 .quick-reschedule-popover__day-btn:hover {
-  background: var(--bg-hover, rgba(31, 45, 71, 0.58));
-  color: var(--text-primary, #f3f7fd);
-  border-color: var(--border-default, rgba(166, 183, 207, 0.14));
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-default);
 }
 
 .quick-reschedule-popover__day-btn.is-active {
-  background: var(--primary, #7477f5);
-  border-color: var(--primary, #7477f5);
+  background: var(--primary);
+  border-color: var(--primary);
   color: #ffffff;
   box-shadow: 0 2px 8px rgba(116, 119, 245, 0.35);
 }
@@ -116,25 +118,25 @@
 .quick-reschedule-popover__slot-btn {
   padding: 6px 8px;
   border-radius: var(--radius-xs, 6px);
-  border: 1px solid var(--border-subtle, rgba(166, 183, 207, 0.085));
-  background: var(--bg-surface-soft, rgba(12, 21, 36, 0.62));
-  color: var(--text-secondary, #b5c0d0);
-  font-size: 0.75rem;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface-soft);
+  color: var(--text-secondary);
+  font-size: 11.5px;
   cursor: pointer;
   text-align: center;
-  transition: all var(--transition, 160ms ease);
+  transition: all var(--transition);
 }
 
 .quick-reschedule-popover__slot-btn:hover {
-  background: var(--bg-hover, rgba(31, 45, 71, 0.58));
-  color: var(--text-primary, #f3f7fd);
-  border-color: var(--border-default, rgba(166, 183, 207, 0.14));
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-default);
 }
 
 .quick-reschedule-popover__slot-btn.is-active {
-  background: var(--primary-soft, rgba(116, 119, 245, 0.13));
-  border-color: var(--primary, #7477f5);
-  color: var(--text-primary, #f3f7fd);
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  color: var(--text-primary);
   font-weight: 600;
 }
 
@@ -146,19 +148,20 @@
 
 .quick-reschedule-popover__time-input {
   flex: 1;
-  padding: 6px 8px;
+  padding: 6px 9px;
   border-radius: var(--radius-xs, 6px);
-  border: 1px solid var(--border-default, rgba(166, 183, 207, 0.14));
-  background: var(--bg-input, rgba(7, 15, 27, 0.66));
-  color: var(--text-primary, #f3f7fd);
-  font-size: 0.85rem;
+  border: 1px solid var(--border-default);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 13px;
   font-family: inherit;
   outline: none;
-  transition: border-color var(--transition, 160ms ease);
+  transition: border-color var(--transition);
 }
 
 .quick-reschedule-popover__time-input:focus {
-  border-color: var(--primary, #7477f5);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-soft);
 }
 
 .quick-reschedule-popover__pin-toggle {
@@ -167,15 +170,15 @@
   justify-content: space-between;
   padding: 8px 10px;
   border-radius: var(--radius-sm, 9px);
-  background: var(--bg-input, rgba(7, 15, 27, 0.66));
-  border: 1px solid var(--border-subtle, rgba(166, 183, 207, 0.085));
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
   cursor: pointer;
 }
 
 .quick-reschedule-popover__pin-toggle input[type="checkbox"] {
   width: 16px;
   height: 16px;
-  accent-color: var(--primary, #7477f5);
+  accent-color: var(--primary);
   cursor: pointer;
 }
 
@@ -185,21 +188,20 @@
   align-items: center;
   margin-top: 4px;
   padding-top: 10px;
-  border-top: 1px solid var(--border-subtle, rgba(166, 183, 207, 0.085));
+  border-top: 1px solid var(--border-subtle);
 }
 
 .quick-reschedule-popover__more-link {
   background: none;
   border: none;
-  color: var(--primary, #7477f5);
-  font-size: 0.78rem;
+  color: var(--primary);
+  font-size: 12px;
   text-decoration: underline;
   cursor: pointer;
   padding: 0;
-  transition: color var(--transition, 160ms ease);
+  transition: color var(--transition);
 }
 
 .quick-reschedule-popover__more-link:hover {
-  color: var(--primary-hover, #8588ff);
+  color: var(--primary-hover);
 }
-

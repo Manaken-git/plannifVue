@@ -496,26 +496,15 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
 
       {/* Solver running in background banner */}
       {solver.isSolving && !solverModalOpen && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '10px 16px',
-            backgroundColor: '#eff6ff',
-            border: '1px solid #bfdbfe',
-            borderRadius: '8px',
-            marginBottom: '16px',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="planning-solver-banner">
+          <div className="planning-solver-banner__content">
             <Loader2 size={18} className="solver-modal__icon-spinner" />
-            <span style={{ fontSize: '0.9rem', color: '#1e40af' }}>
+            <span>
               <strong>Optimisation Timefold en arrière-plan</strong> : Score actuel{' '}
               <code>{solver.progress?.score || 'en calcul...'}</code> ({solver.progress?.elapsedSeconds ?? 0}s écoulées)
             </span>
           </div>
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div className="planning-solver-banner__actions">
             <Button variant="secondary" onClick={() => setSolverModalOpen(true)}>
               Afficher les détails
             </Button>
@@ -644,29 +633,22 @@ export function PlanningPage({ selectedPlanningId, onSelectedPlanningChange }: P
         submitLabel="Enregistrer le planning"
         loading={loading}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.9rem' }}>
-            <strong>Nom du planning</strong>
+        <div className="form-grid">
+          <div className="form-field form-field--full">
+            <label htmlFor="planning-save-name">Nom du planning</label>
             <input
+              id="planning-save-name"
               type="text"
               required
               value={planningSaveName}
               onChange={(e) => setPlanningSaveName(e.target.value)}
               placeholder="ex: Semaine 43 - Lycée"
-              style={{
-                padding: '8px 12px',
-                borderRadius: '6px',
-                border: '1px solid var(--border-color, #cbd5e1)',
-                background: 'var(--surface-color, #ffffff)',
-                color: 'var(--text-color, #0f172a)',
-                fontSize: '0.9rem',
-              }}
             />
-          </label>
-          <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted, #64748b)' }}>
-            Note : Si certaines séances n'ont pas de professeur, pas de salle ou pas de créneau attribué,
-            le backend les enregistrera automatiquement dans la table des séances non planifiées avec le motif associé.
-          </p>
+            <span className="form-helper">
+              Note : Si certaines séances n'ont pas de professeur, pas de salle ou pas de créneau attribué,
+              le backend les enregistrera automatiquement dans la table des séances non planifiées avec le motif associé.
+            </span>
+          </div>
         </div>
       </Modal>
 

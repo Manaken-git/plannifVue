@@ -11,9 +11,12 @@ interface ModalProps {
   onClose: () => void;
   onSubmit?: FormEventHandler<HTMLFormElement>;
   submitLabel?: string;
+  cancelLabel?: string;
   loading?: boolean;
   dangerAction?: { label: string; onClick: () => void };
   size?: 'sm' | 'md' | 'lg';
+  hideFooter?: boolean;
+  customFooter?: ReactNode;
 }
 
 export function Modal({
@@ -24,9 +27,12 @@ export function Modal({
   onClose,
   onSubmit,
   submitLabel = 'Enregistrer',
+  cancelLabel,
   loading = false,
   dangerAction,
   size = 'md',
+  hideFooter = false,
+  customFooter,
 }: ModalProps) {
   if (!open) return null;
 
@@ -45,17 +51,27 @@ export function Modal({
 
         <form className="modal__form" onSubmit={onSubmit}>
           <div className="modal__body">{children}</div>
-          <footer className="modal__footer">
-            {dangerAction && (
-              <Button type="button" variant="danger" onClick={dangerAction.onClick} className="modal__danger">
-                {dangerAction.label}
-              </Button>
-            )}
-            <div className="modal__footer-actions">
-              <Button type="button" variant="secondary" onClick={onClose}>Annuler</Button>
-              {onSubmit && <Button type="submit" loading={loading}>{submitLabel}</Button>}
-            </div>
-          </footer>
+          {!hideFooter && (
+            <footer className="modal__footer">
+              {customFooter ? (
+                customFooter
+              ) : (
+                <>
+                  {dangerAction && (
+                    <Button type="button" variant="danger" onClick={dangerAction.onClick} className="modal__danger">
+                      {dangerAction.label}
+                    </Button>
+                  )}
+                  <div className="modal__footer-actions">
+                    <Button type="button" variant="secondary" onClick={onClose}>
+                      {cancelLabel || (onSubmit ? 'Annuler' : 'Fermer')}
+                    </Button>
+                    {onSubmit && <Button type="submit" loading={loading}>{submitLabel}</Button>}
+                  </div>
+                </>
+              )}
+            </footer>
+          )}
         </form>
       </section>
     </div>

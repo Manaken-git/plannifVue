@@ -1,4 +1,4 @@
 .professeurs-table { min-width: 1080px; }
-.professeurs-table__identity { display: flex; align-items: center; gap: 9px; }
-.professeurs-table__avatar { width: 28px; height: 28px; display: grid; place-items: center; flex: 0 0 auto; border: 1px solid rgba(99,102,241,.15); border-radius: 8px; color: #b8baff; background: var(--primary-softer); font-size: 9px; font-weight: 700; text-transform: uppercase; }
-.professeurs-table__constraints { color: var(--text-faint); font-size: 9px; white-space: nowrap; }
+.professeurs-table__identity { display: flex; align-items: center; gap: 10px; }
+.professeurs-table__avatar { width: 32px; height: 32px; display: grid; place-items: center; flex: 0 0 auto; border: 1px solid rgba(116, 119, 245, 0.22); border-radius: var(--radius-sm, 9px); color: #c9cbff; background: var(--primary-soft); font-size: 11px; font-weight: 700; text-transform: uppercase; }
+.professeurs-table__constraints { color: var(--text-muted); font-size: 11.5px; white-space: nowrap; }

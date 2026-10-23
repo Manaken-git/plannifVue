@@ -46,14 +46,14 @@
 .google-agenda__calendar-icon {
   width: 38px;
   height: 38px;
-  border-radius: 9px;
-  background: linear-gradient(135deg, #4285F4 0%, #1a73e8 100%);
+  border-radius: var(--radius-sm, 9px);
+  background: linear-gradient(135deg, var(--primary, #7477f5) 0%, #5659e8 100%);
   color: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(66, 133, 244, 0.35);
+  box-shadow: 0 4px 14px rgba(116, 119, 245, 0.35);
   font-weight: 700;
   line-height: 1;
 }
@@ -191,19 +191,19 @@
   gap: 10px;
   width: 100%;
   padding: 10px 16px;
-  border-radius: 999px;
-  border: 1px solid var(--border-strong, rgba(166, 183, 207, 0.23));
-  background: linear-gradient(135deg, rgba(66, 133, 244, 0.18), rgba(116, 119, 245, 0.22));
+  border-radius: var(--radius-sm, 9px);
+  border: 1px solid rgba(116, 119, 245, 0.35);
+  background: linear-gradient(135deg, rgba(116, 119, 245, 0.22), rgba(86, 89, 232, 0.14));
   color: var(--text-primary, #f3f7fd);
   font-weight: 600;
-  font-size: 0.88rem;
+  font-size: 13px;
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   transition: all var(--transition, 160ms ease);
 }
 
 .google-agenda__sidebar-create-btn:hover {
-  background: linear-gradient(135deg, rgba(66, 133, 244, 0.28), rgba(116, 119, 245, 0.32));
+  background: linear-gradient(135deg, rgba(116, 119, 245, 0.32), rgba(86, 89, 232, 0.24));
   border-color: var(--primary, #7477f5);
   transform: translateY(-1px);
 }
@@ -297,8 +297,8 @@
 }
 
 .google-agenda__minical-cell.is-today {
-  background: rgba(66, 133, 244, 0.25);
-  color: #93c5fd;
+  background: rgba(116, 119, 245, 0.22);
+  color: #c9cbff;
   font-weight: 700;
 }
 

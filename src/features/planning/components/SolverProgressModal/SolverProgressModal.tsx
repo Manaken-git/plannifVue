@@ -41,6 +41,42 @@ export function SolverProgressModal({
       title="Résolution automatique de l'emploi du temps"
       description="Optimisation des cours, salles et contraintes enseignants par Timefold Solver."
       size="md"
+      customFooter={
+        <div className="modal__footer-actions" style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+          {isSolving && (
+            <>
+              <Button
+                type="button"
+                variant="danger"
+                icon={<Square size={16} />}
+                onClick={onStop}
+              >
+                Arrêter et valider cette solution
+              </Button>
+              <Button type="button" variant="secondary" onClick={onClose}>
+                Laisser tourner en arrière-plan
+              </Button>
+            </>
+          )}
+
+          {!isSolving && (
+            <>
+              {result?.savedPlanningId && onViewResult && (
+                <Button
+                  type="button"
+                  variant="primary"
+                  onClick={() => onViewResult(result.savedPlanningId!)}
+                >
+                  Afficher le planning résolu #{result.savedPlanningId}
+                </Button>
+              )}
+              <Button type="button" variant="secondary" onClick={onClose}>
+                Fermer
+              </Button>
+            </>
+          )}
+        </div>
+      }
     >
       <div className="solver-modal">
         {/* Banner state */}
@@ -140,42 +176,6 @@ export function SolverProgressModal({
             Vous pouvez arrêter le calcul à tout moment pour adopter immédiatement ce planning.
           </p>
         )}
-
-        {/* Bottom actions */}
-        <div className="solver-modal__footer-actions">
-          {isSolving && (
-            <>
-              <Button
-                type="button"
-                variant="danger"
-                icon={<Square size={16} />}
-                onClick={onStop}
-              >
-                Arrêter et valider cette solution
-              </Button>
-              <Button type="button" variant="secondary" onClick={onClose}>
-                Laisser tourner en arrière-plan
-              </Button>
-            </>
-          )}
-
-          {!isSolving && (
-            <>
-              {result?.savedPlanningId && onViewResult && (
-                <Button
-                  type="button"
-                  variant="primary"
-                  onClick={() => onViewResult(result.savedPlanningId!)}
-                >
-                  Afficher le planning résolu #{result.savedPlanningId}
-                </Button>
-              )}
-              <Button type="button" variant="secondary" onClick={onClose}>
-                Fermer
-              </Button>
-            </>
-          )}
-        </div>
       </div>
     </Modal>
   );

@@ -10,28 +10,28 @@
   gap: 12px;
   padding: 12px 16px;
   border-radius: var(--radius-sm, 9px);
-  background: var(--danger-soft, rgba(251, 127, 148, 0.10));
+  background: var(--danger-soft);
   border: 1px solid rgba(251, 127, 148, 0.28);
-  color: var(--text-primary, #f3f7fd);
+  color: var(--text-primary);
 }
 
 .snp-modal__banner-icon {
-  color: var(--danger, #fb7f94);
+  color: var(--danger);
   flex-shrink: 0;
   margin-top: 2px;
 }
 
 .snp-modal__banner-text h4 {
   margin: 0 0 4px;
-  font-size: 0.95rem;
+  font-size: 14px;
   font-weight: 600;
-  color: var(--danger, #fb7f94);
+  color: var(--danger);
 }
 
 .snp-modal__banner-text p {
   margin: 0;
-  font-size: 0.84rem;
-  color: var(--text-secondary, #b5c0d0);
+  font-size: 12.5px;
+  color: var(--text-secondary);
   line-height: 1.45;
 }
 
@@ -45,54 +45,54 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 5px 12px;
   border-radius: 9999px;
-  font-size: 0.8rem;
-  background: var(--bg-surface-raised, rgba(20, 31, 51, 0.78));
-  color: var(--text-secondary, #b5c0d0);
-  border: 1px solid var(--border-default, rgba(166, 183, 207, 0.14));
+  font-size: 12px;
+  background: var(--bg-surface-raised);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
 }
 
 .snp-modal__stat-pill strong {
-  color: var(--text-primary, #f3f7fd);
+  color: var(--text-primary);
 }
 
 .snp-modal__stat-pill--danger {
-  background: var(--danger-soft, rgba(251, 127, 148, 0.10));
-  color: var(--danger, #fb7f94);
+  background: var(--danger-soft);
+  color: var(--danger);
   border-color: rgba(251, 127, 148, 0.32);
 }
 
 .snp-modal__stat-pill--danger strong {
-  color: var(--danger, #fb7f94);
+  color: var(--danger);
 }
 
 .snp-modal__stat-pill--warning {
-  background: var(--warning-soft, rgba(246, 199, 96, 0.10));
-  color: var(--warning, #f6c760);
+  background: var(--warning-soft);
+  color: var(--warning);
   border-color: rgba(246, 199, 96, 0.32);
 }
 
 .snp-modal__stat-pill--warning strong {
-  color: var(--warning, #f6c760);
+  color: var(--warning);
 }
 
 .snp-modal__search {
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .snp-modal__table-container {
-  max-height: 400px;
+  max-height: 420px;
   overflow-y: auto;
-  border: 1px solid var(--border-default, rgba(166, 183, 207, 0.14));
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-sm, 9px);
-  background: var(--bg-surface, rgba(16, 25, 42, 0.72));
+  background: var(--bg-surface);
 }
 
 .snp-modal__table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.85rem;
+  font-size: 13px;
   text-align: left;
 }
 
@@ -102,18 +102,18 @@
   background: rgba(10, 17, 29, 0.98);
   padding: 10px 14px;
   font-weight: 700;
-  color: var(--text-muted, #7a899f);
+  color: var(--text-muted);
   font-size: 11px;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.055em;
   text-transform: uppercase;
-  border-bottom: 1px solid var(--border-default, rgba(166, 183, 207, 0.14));
+  border-bottom: 1px solid var(--border-default);
   z-index: 1;
 }
 
 .snp-modal__table td {
   padding: 10px 14px;
-  border-bottom: 1px solid var(--border-subtle, rgba(166, 183, 207, 0.085));
-  color: var(--text-secondary, #b5c0d0);
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
   vertical-align: middle;
 }
 
@@ -122,11 +122,11 @@
 }
 
 .snp-modal__table tr {
-  transition: background var(--transition, 160ms ease);
+  transition: background var(--transition);
 }
 
 .snp-modal__table tr:hover {
-  background: var(--bg-hover, rgba(31, 45, 71, 0.58));
+  background: var(--bg-hover);
 }
 
 .snp-modal__motifs {
@@ -137,7 +137,6 @@
 
 .snp-modal__missing-tag {
   font-style: italic;
-  color: var(--text-faint, #56657a);
-  font-size: 0.8rem;
+  color: var(--text-faint);
+  font-size: 11.5px;
 }
-

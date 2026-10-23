@@ -366,7 +366,7 @@ export function ClassesPresenceAgenda({
             </div>
             <div className="google-agenda__logo-text">
               <strong>Présence des classes</strong>
-              <small>Format Google Agenda</small>
+              <small>Suivi des sessions & alternances</small>
             </div>
           </div>
 
